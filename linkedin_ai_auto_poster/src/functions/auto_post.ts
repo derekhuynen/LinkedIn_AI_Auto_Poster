@@ -14,7 +14,7 @@ export async function autoPostTimer(
 		context.log('Error during LinkedIn auto-post flow execution:', {
 			error: error.message,
 			stack: error.stack,
-			schedule: process.env.LINKEDIN_POST_SCHEDULE || '0 30 20 * * *', // Timer schedule for reference
+			schedule: process.env.LINKEDIN_POST_SCHEDULE || '0 0 16 * * *', // Timer schedule for reference
 		});
 		throw error; // Re-throw the error for monitoring or retries
 	}
@@ -23,6 +23,6 @@ export async function autoPostTimer(
 // Added comments for clarity
 app.timer('linkedin_post_timer', {
 	// Schedule: Every day at 9 AM
-	schedule: process.env.LINKEDIN_POST_SCHEDULE || '0 30 20 * * *',
+	schedule: process.env.LINKEDIN_POST_SCHEDULE || '0 0 16 * * *',
 	handler: autoPostTimer,
 });
