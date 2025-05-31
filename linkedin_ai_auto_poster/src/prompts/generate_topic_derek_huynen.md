@@ -1,73 +1,66 @@
 # Prompt for Generating LinkedIn Post Topic and Description for Derek Huynen
 
-You are tasked with generating a single compelling, relevant topic and detailed description to serve as the basis for engaging LinkedIn post for Derek Huynen, a Senior Software Developer specializing in cloud-based technologies, AI integration, and full-stack development. Make sure to pick a topic that aligns with Derek's expertise and resonates with his professional network.
+## GOAL
 
-## Derek Huynen Professional Overview:
+Generate a single compelling, relevant topic and research to serve as the basis for an engaging LinkedIn post for Derek Huynen, a Senior Software Developer specializing in cloud-based technologies, AI integration, and full-stack development. The topic should align with Derek's expertise and resonate with his professional network.
 
-- **Current Role**: Senior Software Developer at Neudesic, specializing in Microsoft technologies.
-- **Specializations**: Cloud technologies, AI integration, full-stack development, Azure, React, Node.js, TypeScript, C#, .Net, TanStack, Material-UI, Semantic Kernel, RAG Pattern, Cosmos DB, Azure Functions.
-- **Development Practices**: Agile methodologies, CI/CD pipelines, DevOps (Azure DevOps).
-- **Industry Experience**: Healthcare, energy, retail, insurance.
-- **Professional Strengths**: Designing scalable solutions, leading teams, delivering innovative technology solutions.
+## Derek Huynen Professional Overview
 
-## Guidelines for Generating Topics and Descriptions:
+- **Current Role:** Senior Software Developer at Neudesic, specializing in Microsoft technologies
+- **Specializations:** AI Solutions, Frontend Development (React), Full-Stack Development, Cloud Solutions (Azure), Document Automation
+- **Technical Skills:**
+  - **Languages:** TypeScript, JavaScript, C#
+  - **Frameworks:** React, Node.js, .NET Core
+    - **Libraries:** Zustand, Redux, Material-UI (MUI)
+  - **Cloud Platforms:** Microsoft Azure (Azure Functions, Azure AI Search)
+  - **AI Technologies:** OpenAI, Semantic Kernel, Azure Cognitive Services, Document Intelligence, RAG (Retrieval-Augmented Generation)
+- **Databases:** SQL Server, Cosmos DB
+- **Tools:** Git, Docker
+- **Development Practices:** Agile methodologies, CI/CD pipelines, Azure DevOps, GitHub Actions
+- **Industry Experience:** Healthcare, Energy, Retail, Insurance, Financial Services
+- **Professional Strengths:** Designing scalable solutions, leading teams, delivering innovative technology solutions, problem-solving, mentoring junior developers
 
-### Topic Generation:
+## Instructions
 
-- Generate an engaging, professional, and relevant topic aligned with Derek’s areas of expertise.
-- Ensure the topic reflects current industry trends, innovative technology insights, personal experiences in software development, or best practices.
-- Topics should align well with Derek’s background and resonate with his professional network.
+1. **Topic Selection:**
 
-### Description Generation:
+   - Choose a topic relevant to Derek's skillset and current industry trends.
+   - The topic should be engaging and provide value to his professional network.
+   - Keep the topic short (1–3 words).
+   - The user will pass in the past 3–5 topics dynamically to this prompt. Avoid repeating any of these past topics (see the "PAST TOPICS" section if provided).
 
-- Provide a detailed description (1-2 sentences) clearly outlining what Derek can discuss in the LinkedIn post.
+2. **Topic Description:**
 
-## Examples of Suitable Topics:
+   - Write a 1-sentence description of the topic that could be used as the opening hook for the LinkedIn post.
+   - The description should be concise, engaging, and provide a clear understanding of what the topic is about.
+   - Highlight its relevance to Derek's expertise and the potential impact on his professional network.
 
-- Front-end Development Trends: The Rise of React and Its Impact on User Experience
-- Explore the latest trends in front-end development, focusing on how React is shaping user experience and design patterns in modern applications.
-- The future of AI integration in healthcare solutions.
-- Best practices for effective full-stack development teams.
-- Lessons learned from implementing cloud-based solutions in enterprise environments.
-- How to leverage Azure and React to build scalable applications.
-- Trends and innovations in AI-powered document automation.
+3. **Research:**
 
-## Formatting:
+   - Provide 2–3 sentences of research or insights related to the topic.
+   - This should include practical applications, benefits, or recent advancements in the field that Derek can share with his network.
+   - The research should be informative and demonstrate Derek's knowledge and thought leadership in the area.
 
-- Avoid use mdash or complex punctuation.
-- Use clear, concise language.
-- Only return the topic and description. No additional text or preamble.
-- Clearly separate the topic and description.
-- Keep descriptions professional, concise, and practical.
+4. **Output Format:**
 
-### Examples:
+   - Ensure the output is in JSON format with the keys `topic`, `topic_description`, and `research`. Properly format the JSON without any additional text or formatting.
 
-- 'Why I prefer Zustand over Redux for state management'
-- 'Understanding the AI RAG Pattern and its applications'
-- 'How to set up a custom theme in Material-UI (MUI)'
-- 'What it’s like being a Senior Software Developer at Neudesic'
-- 'The benefits of using Semantic Kernel for AI projects'
-- 'How to leverage Azure Functions for scalable cloud solutions'
-- 'Exploring the power of AI in document processing with Azure OCR'
-- 'Tips for integrating AI search capabilities into your applications'
-- 'Why TypeScript is essential for modern web development'
-- 'The role of Agile methodologies in successful software projects'
-- 'How to optimize React applications for performance'
-- 'The future of AI in software development: Trends to watch'
-- 'Best practices for using GPT-4 in enterprise applications'
-- 'How to build scalable applications with Node.js and Azure'
-- 'The importance of CI/CD pipelines in modern development workflows'
-- 'How AI is transforming the healthcare industry'
-- 'The challenges and rewards of leading cross-functional teams'
-- 'Why I enjoy working with Microsoft Azure for cloud solutions'
-- 'The impact of AI-powered chatbots on IT support'
-- 'How to create user-friendly interfaces with React and Material-UI'
-- 'The value of continuous learning in a tech career'
-- 'How to implement advanced filtering in React with Redux Sagas'
-- 'The importance of data security in cloud-based applications'
-- 'How to use AI to enhance document generation workflows'
-- 'The role of open-source tools in accelerating development'
-- 'How to design intuitive dashboards for data visualization'
-- 'The benefits of using Azure AI Search for enterprise solutions'
-- 'How to automate workflows with Azure Functions and Queues'
-- 'The importance of collaboration in large-scale software projects'
+   {
+   "topic": "string", // The topic should be 1–3 words long
+   "topic_description": "string", // 1-sentence description of the topic
+   "research": "string" // 2–3 sentences of research or insights related to the topic
+   }
+
+## Important Notes
+
+- Ensure the topic is relevant to Derek's professional background and current role.
+- The description should be engaging and suitable for a professional audience on LinkedIn.
+- Focus on providing value and insights that can help Derek's network understand the topic better.
+
+## Example Outputs
+
+{
+"topic": "Redux",
+"topic_description": "Exploring the Power of Redux in Modern Web Development",
+"research": "Redux is a powerful state management library that enhances the predictability and maintainability of applications, especially in complex React projects. By centralizing application state, Redux simplifies debugging and testing, making it easier for developers to manage data flow in large-scale applications. Its integration with tools like Zustand and Material-UI further streamlines the development process, enabling teams to build robust and scalable web applications."
+}
