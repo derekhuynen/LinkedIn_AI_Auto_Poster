@@ -1,4 +1,4 @@
-import { InvocationContext } from '@azure/functions';
+import { InvocationContext, trigger } from '@azure/functions';
 import { OpenAiService } from '../service/OpenAiService';
 import { getModelDetails, OpenAIModels } from '../constants/constants';
 import { MdService } from '../service/MdService';
@@ -20,12 +20,16 @@ type GenerateTopicPromptResponse = {
 	research: string;
 };
 
-export async function linkedInPostFlow(context: InvocationContext): Promise<{
+export async function linkedInPostFlow(
+	context: InvocationContext,
+	triggerBy: string
+): Promise<{
 	topic: string;
 	topicDescription: string;
 	research: string;
 	linkedInPost: string;
 	createdAt: string;
+	triggerBy: string;
 }> {
 	const containerId = process.env.COSMOS_LINKEDIN_CONTAINER || '';
 
@@ -88,6 +92,7 @@ export async function linkedInPostFlow(context: InvocationContext): Promise<{
 			research: topicData.research,
 			linkedInPost: linkedInPost,
 			createdAt: createdAt,
+			triggerBy: triggerBy,
 		});
 
 		return {
@@ -96,6 +101,7 @@ export async function linkedInPostFlow(context: InvocationContext): Promise<{
 			research: topicData.research,
 			linkedInPost: linkedInPost,
 			createdAt: createdAt,
+			triggerBy: triggerBy,
 		};
 	} catch (error: any) {
 		context.log('Error generating or posting LinkedIn post', error);

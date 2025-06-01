@@ -8,7 +8,7 @@ export async function autoPostTimer(
 ): Promise<void> {
 	try {
 		context.log('Starting LinkedIn auto-post flow...');
-		await linkedInPostFlow(context);
+		await linkedInPostFlow(context, 'timer');
 		context.log('LinkedIn auto-post flow completed successfully.');
 	} catch (error: any) {
 		context.log('Error during LinkedIn auto-post flow execution:', {

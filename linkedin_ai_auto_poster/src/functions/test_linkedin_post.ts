@@ -36,7 +36,7 @@ export async function testLinkedInPost(
 				},
 			};
 		}
-		const { topic, linkedInPost } = await linkedInPostFlow(context);
+		const { topic, linkedInPost } = await linkedInPostFlow(context, 'http');
 
 		context.log('LinkedIn post test tool completed successfully.');
 		console.log('Generated LinkedIn post:', linkedInPost);
