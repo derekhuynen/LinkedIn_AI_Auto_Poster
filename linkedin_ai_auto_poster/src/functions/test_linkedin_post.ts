@@ -6,23 +6,21 @@ import {
 } from '@azure/functions';
 import { linkedInPostFlow } from '../flow/linkedin_post_flow';
 
-// Added comments to clarify purpose and safeguard against accidental deployment
 /**
- * This function is a test tool to validate the LinkedIn post flow logic.
- * It is not intended for deployment to production.
+ * Azure Function to test the LinkedIn post flow logic.
+ * Not intended for production deployment.
+ *
+ * @param {HttpRequest} request - The HTTP request object
+ * @param {InvocationContext} context - The Azure Functions invocation context
+ * @returns {Promise<HttpResponseInit>} The HTTP response with test results or error details
  */
-
 export async function testLinkedInPost(
 	request: HttpRequest,
 	context: InvocationContext
 ): Promise<HttpResponseInit> {
 	try {
 		context.log('Starting LinkedIn post test tool...');
-
 		const enabledTesting = process.env.ENABLED_TEST_POST;
-
-		context.log('Testing environment variable:', enabledTesting);
-
 		if (!enabledTesting || enabledTesting !== 'true') {
 			context.log('Testing is disabled. Exiting...');
 			return {
@@ -37,10 +35,7 @@ export async function testLinkedInPost(
 			};
 		}
 		const { topic, linkedInPost } = await linkedInPostFlow(context, 'http');
-
 		context.log('LinkedIn post test tool completed successfully.');
-		console.log('Generated LinkedIn post:', linkedInPost);
-
 		return {
 			status: 200,
 			body: JSON.stringify({
@@ -58,7 +53,6 @@ export async function testLinkedInPost(
 			error: error.message,
 			stack: error.stack,
 		});
-
 		return {
 			status: 500,
 			body: JSON.stringify({

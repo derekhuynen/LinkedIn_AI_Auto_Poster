@@ -11,11 +11,14 @@
     "prestart": "npm run clean && npm run build",
     "start": "func start",
     "test": "echo \"No tests yet...\"",
+    "test:dalle": "tsc && node dist/src/scripts/test_dalle3.js",
+    "test:storage": "tsc && node dist/src/scripts/test_image_storage.js",
     "postbuild": "cpx \"src/prompts/*.md\" dist/src/prompts/"
   },
   "dependencies": {
     "@azure/cosmos": "^4.4.1",
     "@azure/functions": "^4.0.0",
+    "@azure/storage-blob": "^12.27.0",
     "axios": "^1.9.0",
     "openai": "^4.100.0"
   },

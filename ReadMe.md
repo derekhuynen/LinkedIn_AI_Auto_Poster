@@ -9,8 +9,10 @@ The LinkedIn AI Auto Poster is an intelligent, AI-driven solution designed to au
 - **AI-Enhanced Daily Automation**: Automatically executes daily at 9 AM, handling content creation and posting seamlessly.
 - **Dynamic AI Topic Generation**: Utilizes Azure OpenAI to craft unique and relevant topics, intelligently avoiding repetition.
 - **Automated Content Creation**: Produces captivating LinkedIn posts with advanced AI-generated insights.
-- **Direct LinkedIn Integration**: Publishes AI-crafted content directly to your LinkedIn profile or page.
-- **Efficient Data Storage**: Archives generated posts in Azure Cosmos DB for future reference, analysis, and repurposing.
+- **DALL-E 3 Image Generation**: Creates professional, engaging images for each post to boost engagement and visibility.
+- **Parallel Processing**: Generates content and images simultaneously for optimal performance.
+- **Direct LinkedIn Integration**: Publishes AI-crafted content with images directly to your LinkedIn profile or page.
+- **Efficient Data Storage**: Archives generated posts, images, and metadata in Azure Cosmos DB for future reference, analysis, and repurposing.
 
 ## AI-Powered Architecture
 
@@ -25,9 +27,10 @@ The solution employs a robust combination of Azure services:
 
 1. **Content Analysis**: Retrieves recent posts from Azure Cosmos DB to ensure fresh topic selection.
 2. **AI-Driven Topic Generation**: Generates distinctive topics using a specialized AI prompt.
-3. **AI Content Creation**: Crafts high-quality LinkedIn posts leveraging AI to enhance audience engagement.
-4. **Automated Posting**: Seamlessly publishes the AI-generated content directly onto LinkedIn.
-5. **Archiving & Analysis**: Saves each post into Azure Cosmos DB, supporting future insights and analytics.
+3. **Parallel Content & Image Creation**: Simultaneously crafts high-quality LinkedIn posts and generates professional images using DALL-E 3.
+4. **Image Processing**: Downloads generated images and uploads them to LinkedIn's media service.
+5. **Automated Posting**: Seamlessly publishes the AI-generated content with images directly onto LinkedIn.
+6. **Archiving & Analysis**: Saves each post, image metadata, and generation prompts into Azure Cosmos DB, supporting future insights and analytics.
 
 ## Environment Configuration
 
@@ -37,7 +40,7 @@ Essential environment variables include:
 - `OPENAI_API_KEY`, `OPENAI_ENDPOINT`, `OPENAI_API_VERSION`
 - `LINKEDIN_ACCESS_TOKEN`, `LINKEDIN_MEMBER_URN`
 - `COSMOS_KEY`, `COSMOS_ENDPOINT`, `COSMOS_DATABASE_ID`, `COSMOS_LINKEDIN_CONTAINER`
-- `ENABLED_TESTING`
+- `ENABLE_LINKEDIN_POST`, `ENABLE_IMAGE_GENERATION`
 
 ## Project Structure
 
@@ -54,10 +57,12 @@ linkedin_ai_auto_poster/
 │   │   └── linkedin_post_flow.ts
 │   ├── functions/
 │   │   ├── auto_post.ts
-│   │   └── test_linkedin_post.ts
+│   │   ├── test_linkedin_post.ts
+│   │   └── test_image_generation.ts
 │   ├── prompts/
 │   │   ├── generate_linkedin_post_derek_huynen.md
-│   │   └── generate_topic_derek_huynen.md
+│   │   ├── generate_topic_derek_huynen.md
+│   │   └── generate_linkedin_image_prompt.md
 │   ├── service/
 │   │   ├── CosmosService.ts
 │   │   ├── LinkedinService.ts
@@ -106,10 +111,26 @@ linkedin_ai_auto_poster/
    func start
    ```
 
-5. **Deploy to Azure**:
+5. **Test Image Generation**:
+   Test the DALL-E 3 image generation feature:
+
+   ```bash
+   .\scripts\test_dalle3.ps1
+   ```
+
+6. **Deploy to Azure**:
    ```bash
    func azure functionapp publish <function-app-name>
    ```
+
+## Documentation
+
+- **Main Guide**: [ReadMe.md](ReadMe.md) - Overview and main documentation
+- **Environment Variables**: [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md) - Configuration settings
+- **Image Generation Guide**: [IMAGE_GENERATION_GUIDE.md](IMAGE_GENERATION_GUIDE.md) - Using the image generation feature
+- **DALL-E 3 Testing**: [DALLE3_TESTING.md](DALLE3_TESTING.md) - Testing the DALL-E 3 integration
+- **Customizing Images**: [CUSTOMIZE_DALLE3_IMAGES.md](CUSTOMIZE_DALLE3_IMAGES.md) - Tailoring image generation
+- **Sample Prompts**: [SAMPLE_IMAGE_PROMPTS.md](SAMPLE_IMAGE_PROMPTS.md) - Example prompts for reference
 
 ## Azure AI Setup
 

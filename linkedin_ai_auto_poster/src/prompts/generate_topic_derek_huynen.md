@@ -11,7 +11,7 @@ Generate a single compelling, relevant topic and research to serve as the basis 
 - **Technical Skills:**
   - **Languages:** TypeScript, JavaScript, C#
   - **Frameworks:** React, Node.js, .NET Core
-    - **Libraries:** Zustand, Redux, Material-UI (MUI)
+    - **Libraries:** Zustand, Redux, Material-UI (MUI), Tailwind CSS, ZOD, YUP, React Hook Form, React Query, Axios, Express.js,
   - **Cloud Platforms:** Microsoft Azure (Azure Functions, Azure AI Search)
   - **AI Technologies:** OpenAI, Semantic Kernel, Azure Cognitive Services, Document Intelligence, RAG (Retrieval-Augmented Generation)
 - **Databases:** SQL Server, Cosmos DB
@@ -41,9 +41,7 @@ Generate a single compelling, relevant topic and research to serve as the basis 
    - This should include practical applications, benefits, or recent advancements in the field that Derek can share with his network.
    - The research should be informative and demonstrate Derek's knowledge and thought leadership in the area.
 
-4. **Output Format:**
-
-   - Ensure the output is in JSON format with the keys `topic`, `topic_description`, and `research`. Properly format the JSON without any additional text or formatting.
+4. **Output Format:** - Ensure the output is in JSON format with the keys `topic`, `topic_description`, and `research`. Properly format the JSON without any additional text or formatting.
 
    {
    "topic": "string", // The topic should be 1–3 words long
