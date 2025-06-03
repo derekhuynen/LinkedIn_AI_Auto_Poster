@@ -123,8 +123,8 @@ export async function testImageGeneration(
 	}
 }
 
-app.http('testImageGeneration', {
-	methods: ['GET', 'POST'],
+app.http('test_image_generation', {
+	methods: ['GET'],
 	authLevel: 'anonymous',
 	handler: testImageGeneration,
 });
