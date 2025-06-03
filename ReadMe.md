@@ -10,37 +10,18 @@ The LinkedIn AI Auto Poster is an intelligent, AI-driven solution designed to au
 - **Dynamic AI Topic Generation**: Utilizes Azure OpenAI to craft unique and relevant topics, intelligently avoiding repetition.
 - **Automated Content Creation**: Produces captivating LinkedIn posts with advanced AI-generated insights.
 - **DALL-E 3 Image Generation**: Creates professional, engaging images for each post to boost engagement and visibility.
-- **Parallel Processing**: Generates content and images simultaneously for optimal performance.
 - **Direct LinkedIn Integration**: Publishes AI-crafted content with images directly to your LinkedIn profile or page.
-- **Efficient Data Storage**: Archives generated posts, images, and metadata in Azure Cosmos DB for future reference, analysis, and repurposing.
+- **Efficient Data Storage**: Archives generated posts, images, and metadata in Azure Cosmos DB for future reference and analysis.
 
-## AI-Powered Architecture
+## Architecture
 
-The solution employs a robust combination of Azure services:
+The solution leverages these Azure services:
 
 - **Azure Functions**: Scheduled timer-triggered functions manage daily automation.
-- **Azure OpenAI**: Provides state-of-the-art generative AI capabilities for topic and content creation.
+- **Azure OpenAI**: Provides generative AI capabilities for topic and content creation.
 - **Azure Cosmos DB**: Securely stores generated posts, ensuring data persistence and easy retrieval.
-- **Secure Environment Management**: Uses environment variables and Azure Key Vault to safely manage API keys and connection strings.
-
-## Intelligent Workflow
-
-1. **Content Analysis**: Retrieves recent posts from Azure Cosmos DB to ensure fresh topic selection.
-2. **AI-Driven Topic Generation**: Generates distinctive topics using a specialized AI prompt.
-3. **Parallel Content & Image Creation**: Simultaneously crafts high-quality LinkedIn posts and generates professional images using DALL-E 3.
-4. **Image Processing**: Downloads generated images and uploads them to LinkedIn's media service.
-5. **Automated Posting**: Seamlessly publishes the AI-generated content with images directly onto LinkedIn.
-6. **Archiving & Analysis**: Saves each post, image metadata, and generation prompts into Azure Cosmos DB, supporting future insights and analytics.
-
-## Environment Configuration
-
-Essential environment variables include:
-
-- `AzureWebJobsStorage`, `FUNCTIONS_WORKER_RUNTIME`
-- `OPENAI_API_KEY`, `OPENAI_ENDPOINT`, `OPENAI_API_VERSION`
-- `LINKEDIN_ACCESS_TOKEN`, `LINKEDIN_MEMBER_URN`
-- `COSMOS_KEY`, `COSMOS_ENDPOINT`, `COSMOS_DATABASE_ID`, `COSMOS_LINKEDIN_CONTAINER`
-- `ENABLE_LINKEDIN_POST`, `ENABLE_IMAGE_GENERATION`
+- **Azure Blob Storage**: Stores generated images before posting.
+- **Azure Key Vault**: Securely manages API keys and connection strings.
 
 ## Project Structure
 
