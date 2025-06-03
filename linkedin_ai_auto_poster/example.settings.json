@@ -1,0 +1,27 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AZURE_OPENAI_API_KEY_EAST": "<your-azure-openai-api-key-east>",
+    "AZURE_OPENAI_API_KEY_WEST": "<your-azure-openai-api-key-west>",
+    "AZURE_OPENAI_API_VERSION_EAST": "2024-02-01",
+    "AZURE_OPENAI_API_VERSION_WEST": "2025-01-01-preview",
+    "AZURE_OPENAI_DALLE_DEPLOYMENT": "dall-e-3",
+    "AZURE_OPENAI_ENDPOINT_EAST": "https://your-azure-openai-endpoint-east.openai.azure.com/",
+    "AZURE_OPENAI_ENDPOINT_WEST": "https://your-azure-openai-endpoint-west.openai.azure.com/",
+    "AZURE_OPENAI_GPT_DEPLOYMENT": "gpt-4.1",
+    "AZURE_STORAGE_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=yourstorageaccount;AccountKey=yourstorageaccountkey;EndpointSuffix=core.windows.net",
+    "AZURE_STORAGE_CONTAINER_NAME": "linkedin-images",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "COSMOS_DATABASE_ID": "AutoPoster",
+    "COSMOS_ENDPOINT": "https://your-cosmos-account.documents.azure.com:443/",
+    "COSMOS_KEY": "<your-cosmos-key>",
+    "COSMOS_LINKEDIN_CONTAINER": "LinkedInPosts",
+    "ENABLE_IMAGE_GENERATION": "true",
+    "ENABLE_LINKEDIN_POST": "true",
+    "ENABLED_TEST_POST": "true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "LINKEDIN_ACCESS_TOKEN": "<your-linkedin-access-token>",
+    "LINKEDIN_MEMBER_URN": "urn:li:person:yourLinkedInId",
+    "LINKEDIN_POST_SCHEDULE": ""
+  }
+}
