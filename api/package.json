@@ -1,8 +1,8 @@
 {
   "name": "linkedin_ai_auto_poster",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "Derek Huynen",
-  "date": "2025-05-17",
+  "date": "2026-05-30",
   "description": "An AI-driven solution for automating LinkedIn content creation and posting using Azure services.",
   "scripts": {
     "build": "tsc",
