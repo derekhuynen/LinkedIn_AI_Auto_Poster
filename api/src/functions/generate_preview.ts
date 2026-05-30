@@ -62,7 +62,9 @@ export async function generatePreview(
 			triggerBy: 'preview',
 			post: false,
 			persist: false,
-			generateImage: true,
+			// Honor the same image toggle as the timer path, so the preview does
+			// not attempt image generation when no image model is deployed.
+			generateImage: process.env.ENABLE_IMAGE_GENERATION === 'true',
 		});
 
 		return {

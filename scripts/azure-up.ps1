@@ -70,6 +70,11 @@ $dryRunCap = if ($cfg.dryRunDailyCap) { [int]$cfg.dryRunDailyCap } else { 50 }
 $seedGallery = $true
 if ($null -ne $cfg.seedGallery) { $seedGallery = [bool]$cfg.seedGallery }
 
+# Image generation is off by default: Azure DALL-E 3 is deprecated and the app's
+# image code targets it. Enable only if a compatible image model is configured.
+$enableImage = $false
+if ($null -ne $cfg.enableImageGeneration) { $enableImage = [bool]$cfg.enableImageGeneration }
+
 # --- Prerequisites ------------------------------------------------------------
 
 Write-Step 'Checking prerequisites'
@@ -166,7 +171,7 @@ $settings = @(
 	# Demo safety: no timer, no LinkedIn publishing. Images still generate for the dry-run.
 	'LINKEDIN_POST_SCHEDULE=',
 	'ENABLE_LINKEDIN_POST=false',
-	'ENABLE_IMAGE_GENERATION=true'
+	"ENABLE_IMAGE_GENERATION=$($enableImage.ToString().ToLower())"
 )
 Invoke-Native 'az' (@('functionapp', 'config', 'appsettings', 'set', '-n', $funcName, '-g', $rg, '-o', 'none', '--settings') + $settings) | Out-Null
 

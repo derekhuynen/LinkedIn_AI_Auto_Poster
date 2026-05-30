@@ -6,6 +6,7 @@
 	"namePrefix": "liaidemo",
 	"dryRunDailyCap": 50,
 	"seedGallery": true,
+	"enableImageGeneration": false,
 	"openai": {
 		"endpointWest": "https://<your-west-resource>.openai.azure.com/",
 		"apiKeyWest": "<your-west-key>",

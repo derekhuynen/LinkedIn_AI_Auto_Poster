@@ -25,6 +25,7 @@ describe('generatePreview', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		process.env.DRYRUN_DAILY_CAP = '50';
+		process.env.ENABLE_IMAGE_GENERATION = 'true';
 	});
 
 	it('returns 429 and does not generate when the cap is reached', async () => {
