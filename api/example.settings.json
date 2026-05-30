@@ -16,6 +16,8 @@
     "COSMOS_ENDPOINT": "https://your-cosmos-account.documents.azure.com:443/",
     "COSMOS_KEY": "<your-cosmos-key>",
     "COSMOS_LINKEDIN_CONTAINER": "LinkedInPosts",
+    "COSMOS_RATELIMIT_CONTAINER": "RateLimits",
+    "DRYRUN_DAILY_CAP": "50",
     "ENABLE_IMAGE_GENERATION": "true",
     "ENABLE_LINKEDIN_POST": "true",
     "ENABLED_TEST_POST": "true",
