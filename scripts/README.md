@@ -8,7 +8,7 @@ deletes the group.
 
 | Service              | Plan               | Idle cost          |
 | -------------------- | ------------------ | ------------------ |
-| Function App         | Consumption        | ~$0 (pay per run)  |
+| Function App         | Flex Consumption   | ~$0 (pay per run)  |
 | Cosmos DB            | Serverless         | ~$0 (pay per RU)   |
 | Static Web App       | Free               | $0                 |
 | Storage              | Standard LRS       | pennies/month      |

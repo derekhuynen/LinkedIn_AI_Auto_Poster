@@ -25,12 +25,16 @@
 #>
 [CmdletBinding()]
 param(
-	[string]$ConfigPath = "$PSScriptRoot/demo.config.json",
+	[string]$ConfigPath = '',
 	[switch]$SkipDeploy
 )
 
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path -Parent $PSScriptRoot
+# Resolve paths from the script location (robust across PowerShell hosts, where
+# $PSScriptRoot is not always populated inside param() defaults).
+$scriptDir = Split-Path -Parent $PSCommandPath
+$repoRoot = Split-Path -Parent $scriptDir
+if (-not $ConfigPath) { $ConfigPath = Join-Path $scriptDir 'demo.config.json' }
 
 function Write-Step($msg) { Write-Host "`n==> $msg" -ForegroundColor Cyan }
 function Write-Info($msg) { Write-Host "    $msg" -ForegroundColor DarkGray }
@@ -42,12 +46,23 @@ function Assert-Command($name, $hint) {
 }
 
 # Runs a native command and throws on non-zero exit. Captures stdout for return.
+# Native tools (npm, func, az) write progress/warnings to stderr; under
+# ErrorActionPreference 'Stop' that would be promoted to a terminating error in
+# Windows PowerShell, so we relax it around the call and judge success by exit code.
 function Invoke-Native {
 	param([string]$Exe, [string[]]$Args, [switch]$Quiet)
 	if (-not $Quiet) { Write-Info "$Exe $($Args -join ' ')" }
-	$output = & $Exe @Args
-	if ($LASTEXITCODE -ne 0) {
-		throw "Command failed ($LASTEXITCODE): $Exe $($Args -join ' ')"
+	$prev = $ErrorActionPreference
+	$ErrorActionPreference = 'Continue'
+	try {
+		$output = & $Exe @Args
+		$code = $LASTEXITCODE
+	}
+	finally {
+		$ErrorActionPreference = $prev
+	}
+	if ($code -ne 0) {
+		throw "Command failed ($code): $Exe $($Args -join ' ')"
 	}
 	return $output
 }
@@ -142,11 +157,10 @@ $cosmosEndpoint = "https://$cosmosName.documents.azure.com:443/"
 
 # --- Function App -------------------------------------------------------------
 
-Write-Step 'Creating Function App (Linux, Consumption, Node 20)'
+Write-Step 'Creating Function App (Flex Consumption, Node 22)'
 Invoke-Native 'az' @('functionapp', 'create', '-n', $funcName, '-g', $rg,
-	'--storage-account', $storageName, '--consumption-plan-location', $cfg.location,
-	'--runtime', 'node', '--runtime-version', '20', '--functions-version', '4',
-	'--os-type', 'Linux', '-o', 'none') | Out-Null
+	'--storage-account', $storageName, '--flexconsumption-location', $cfg.location,
+	'--runtime', 'node', '--runtime-version', '22', '-o', 'none') | Out-Null
 
 Write-Step 'Applying Function App settings'
 $settings = @(
@@ -177,11 +191,17 @@ Invoke-Native 'az' (@('functionapp', 'config', 'appsettings', 'set', '-n', $func
 
 # --- Static Web App -----------------------------------------------------------
 
-Write-Step 'Creating Static Web App (Free) and linking the backend'
+Write-Step 'Creating Static Web App (Free) and enabling CORS to the API'
 Invoke-Native 'az' @('staticwebapp', 'create', '-n', $swaName, '-g', $rg, '-l', $cfg.swaLocation, '--sku', 'Free', '-o', 'none') | Out-Null
-$funcId = (Invoke-Native 'az' @('functionapp', 'show', '-n', $funcName, '-g', $rg, '--query', 'id', '-o', 'tsv') -Quiet).Trim()
-Invoke-Native 'az' @('staticwebapp', 'backends', 'link', '-n', $swaName, '-g', $rg,
-	'--backend-resource-id', $funcId, '--backend-region', $cfg.location, '-o', 'none') | Out-Null
+$swaHost = (Invoke-Native 'az' @('staticwebapp', 'show', '-n', $swaName, '-g', $rg,
+	'--query', 'defaultHostname', '-o', 'tsv') -Quiet).Trim()
+$funcHost = (Invoke-Native 'az' @('functionapp', 'show', '-n', $funcName, '-g', $rg,
+	'--query', 'defaultHostName', '-o', 'tsv') -Quiet).Trim()
+$apiBase = "https://$funcHost"
+# A Free Static Web App cannot link a backend (that requires the Standard SKU), so the
+# dashboard calls the Function App directly. Allow its origin via the function app CORS.
+Invoke-Native 'az' @('functionapp', 'cors', 'add', '-n', $funcName, '-g', $rg,
+	'--allowed-origins', "https://$swaHost", '-o', 'none') | Out-Null
 
 # --- Deploy code + seed -------------------------------------------------------
 
@@ -189,6 +209,12 @@ if (-not $SkipDeploy) {
 	Write-Step 'Building and deploying the API (func publish)'
 	Push-Location (Join-Path $repoRoot 'api')
 	try {
+		# func needs local.settings.json to detect the worker runtime; create a
+		# minimal one if absent (it is gitignored and holds no secrets here).
+		if (-not (Test-Path 'local.settings.json')) {
+			'{"IsEncrypted":false,"Values":{"FUNCTIONS_WORKER_RUNTIME":"node","AzureWebJobsStorage":""}}' |
+				Set-Content 'local.settings.json' -Encoding utf8
+		}
 		Invoke-Native 'npm' @('ci')
 		Invoke-Native 'npm' @('run', 'build')
 		Invoke-Native 'func' @('azure', 'functionapp', 'publish', $funcName)
@@ -198,7 +224,10 @@ if (-not $SkipDeploy) {
 	Write-Step 'Building and deploying the web dashboard'
 	Push-Location (Join-Path $repoRoot 'web')
 	try {
-		$env:NEXT_PUBLIC_USE_SAMPLE_DATA = 'false'   # real API via same-origin linked backend
+		# Bake the API base into the static export so the browser calls the
+		# Function App directly (cross-origin, allowed by the CORS rule above).
+		$env:NEXT_PUBLIC_USE_SAMPLE_DATA = 'false'
+		$env:NEXT_PUBLIC_API_BASE = $apiBase
 		Invoke-Native 'npm' @('ci')
 		Invoke-Native 'npm' @('run', 'build')
 		$swaToken = (Invoke-Native 'az' @('staticwebapp', 'secrets', 'list', '-n', $swaName, '-g', $rg,
@@ -208,6 +237,7 @@ if (-not $SkipDeploy) {
 	}
 	finally {
 		Remove-Item Env:NEXT_PUBLIC_USE_SAMPLE_DATA -ErrorAction SilentlyContinue
+		Remove-Item Env:NEXT_PUBLIC_API_BASE -ErrorAction SilentlyContinue
 		Pop-Location
 	}
 
@@ -219,7 +249,7 @@ if (-not $SkipDeploy) {
 			$env:COSMOS_KEY = $cosmosKey
 			$env:COSMOS_DATABASE_ID = $dbName
 			$env:COSMOS_LINKEDIN_CONTAINER = $postsCtr
-			Invoke-Native 'node' @((Join-Path $PSScriptRoot 'seed-cosmos.mjs'))
+			Invoke-Native 'node' @((Join-Path $scriptDir 'seed-cosmos.mjs'))
 		}
 		finally {
 			'COSMOS_ENDPOINT', 'COSMOS_KEY', 'COSMOS_DATABASE_ID', 'COSMOS_LINKEDIN_CONTAINER' |

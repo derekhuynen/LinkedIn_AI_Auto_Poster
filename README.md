@@ -10,7 +10,7 @@ An autonomous content pipeline on Azure that writes and publishes LinkedIn posts
 
 ## Live demo
 
-**Try it:** <!-- TODO: paste the Azure Static Web Apps URL here after the first deploy -->
+**Try it:** [zealous-water-0f40a230f.7.azurestaticapps.net](https://zealous-water-0f40a230f.7.azurestaticapps.net)
 
 The demo is a read-only gallery of real auto-posted content plus a live, rate-capped "dry-run" that generates a sample post and image on demand but never publishes to LinkedIn. To run it locally with sample data (no Azure needed):
 

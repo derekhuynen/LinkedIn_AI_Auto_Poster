@@ -8,7 +8,15 @@
 //
 //   node ../scripts/seed-cosmos.mjs
 
-import { CosmosClient } from '@azure/cosmos';
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// @azure/cosmos is installed under api/node_modules, not next to this script,
+// so resolve it explicitly (ESM resolves bare specifiers from the file's folder).
+const require = createRequire(import.meta.url);
+const here = dirname(fileURLToPath(import.meta.url));
+const { CosmosClient } = require(join(here, '..', 'api', 'node_modules', '@azure', 'cosmos'));
 
 const endpoint = process.env.COSMOS_ENDPOINT;
 const key = process.env.COSMOS_KEY;

@@ -21,12 +21,15 @@
 #>
 [CmdletBinding()]
 param(
-	[string]$ConfigPath = "$PSScriptRoot/demo.config.json",
+	[string]$ConfigPath = '',
 	[switch]$Force,
 	[switch]$NoWait
 )
 
 $ErrorActionPreference = 'Stop'
+if (-not $ConfigPath) {
+	$ConfigPath = Join-Path (Split-Path -Parent $PSCommandPath) 'demo.config.json'
+}
 
 if (-not (Get-Command 'az' -ErrorAction SilentlyContinue)) {
 	throw "Azure CLI ('az') not found on PATH. Install: https://aka.ms/azure-cli"

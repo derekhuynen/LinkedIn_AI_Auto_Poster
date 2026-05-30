@@ -8,11 +8,11 @@ workflows expect.
 
 | Resource                | Notes                                                                                     |
 | ----------------------- | ----------------------------------------------------------------------------------------- |
-| Azure Functions App     | Node 20 runtime. Hosts the `api/` project (timer + HTTP endpoints).                       |
-| Azure OpenAI            | A GPT-4.1 deployment (West region in this setup) and a DALL-E 3 deployment (East region). |
+| Azure Functions App     | Flex Consumption plan, Node 22 runtime. Hosts the `api/` project (timer + HTTP endpoints). |
+| Azure OpenAI            | A GPT-4.1 deployment for text. (DALL-E 3 is deprecated on Azure; image generation is off by default.) |
 | Blob Storage            | A container for generated images (default `linkedin-images`).                             |
 | Cosmos DB               | Database `AutoPoster` with two containers (see below).                                    |
-| Azure Static Web Apps   | Hosts the `web/` dashboard, with the Function App attached as the linked backend.         |
+| Azure Static Web Apps   | Free SKU. Hosts the `web/` dashboard; the dashboard calls the Function App directly (CORS). |
 
 ### Cosmos DB containers
 
@@ -21,12 +21,14 @@ workflows expect.
 | `LinkedInPosts` | (your choice) | Archived posts shown in the gallery.               |
 | `RateLimits`    | `/id`         | One counter document per UTC day for the dry-run cap. |
 
-### Linked backend (same-origin API)
+### How the dashboard reaches the API
 
-In the Static Web App, link the existing Function App as the backend
-("Bring your own functions/backend"). This makes the browser's `/api/*` calls
-resolve to the Function App same-origin, so the dashboard needs no CORS and no
-API base URL in production.
+A **Free** Static Web App cannot link a backend (that requires the Standard SKU),
+so the dashboard calls the Function App directly. The static export is built with
+`NEXT_PUBLIC_API_BASE` set to the Function App URL, and the Function App allows the
+Static Web App origin via CORS (`az functionapp cors add`). The `scripts/azure-up.ps1`
+script wires this up automatically. If you prefer a same-origin `/api/*` setup,
+upgrade the Static Web App to Standard and link the Function App as the backend.
 
 ## 2. Function App environment variables
 
