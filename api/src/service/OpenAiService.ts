@@ -169,18 +169,28 @@ export class OpenAiService {
 			// Get DALL-E 3 model details from constants
 			const dalleDetails = getModelDetails(OpenAIModels.DALLE_3);
 
-			// Use East region configuration for DALL-E 3
-			const eastEndpoint =
-				process.env.AZURE_OPENAI_ENDPOINT_EAST ||
-				'https://djh-prod-ai-service-us-east.openai.azure.com/';
+			// DALL-E 3 (East region) configuration, validated from environment.
+			const eastEndpoint = process.env.AZURE_OPENAI_ENDPOINT_EAST;
 			const eastApiVersion =
 				process.env.AZURE_OPENAI_API_VERSION_EAST || '2024-02-01';
 			const dalleDeployment =
 				process.env.AZURE_OPENAI_DALLE_DEPLOYMENT || 'dall-e-3';
 			const eastApiKey =
 				process.env.AZURE_OPENAI_API_KEY_EAST ||
-				process.env.AZURE_OPENAI_API_KEY_WEST ||
-				'';
+				process.env.AZURE_OPENAI_API_KEY_WEST;
+
+			if (!eastEndpoint || !eastApiKey) {
+				const missing = [
+					!eastEndpoint && 'AZURE_OPENAI_ENDPOINT_EAST',
+					!eastApiKey &&
+						'AZURE_OPENAI_API_KEY_EAST or AZURE_OPENAI_API_KEY_WEST',
+				]
+					.filter(Boolean)
+					.join(', ');
+				throw new Error(
+					`Missing required environment variables for DALL-E 3: ${missing}`
+				);
+			}
 
 			// Create a new client instance with East region's DALL-E 3 configuration
 			const dalleClient = new AzureOpenAI({
