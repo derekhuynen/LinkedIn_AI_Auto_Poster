@@ -1,0 +1,137 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// Hoisted mock functions shared across the mocked service classes.
+const mocks = vi.hoisted(() => ({
+	generateResponse: vi.fn(),
+	generateImage: vi.fn(),
+	postToLinkedIn: vi.fn(),
+	uploadImageToLinkedIn: vi.fn(),
+	uploadImage: vi.fn(),
+	createItem: vi.fn(),
+	queryItems: vi.fn(),
+}));
+
+vi.mock('../src/service/OpenAiService', () => ({
+	OpenAiService: class {
+		generateResponse = mocks.generateResponse;
+		generateImage = mocks.generateImage;
+	},
+}));
+
+vi.mock('../src/service/LinkedinService', () => ({
+	default: class {
+		postToLinkedIn = mocks.postToLinkedIn;
+		uploadImageToLinkedIn = mocks.uploadImageToLinkedIn;
+	},
+}));
+
+vi.mock('../src/service/CosmosService', () => ({
+	CosmosService: class {
+		queryItems = mocks.queryItems;
+		createItem = mocks.createItem;
+	},
+}));
+
+vi.mock('../src/service/BlobStorageService', () => ({
+	BlobStorageService: class {
+		uploadImage = mocks.uploadImage;
+	},
+}));
+
+import { linkedInPostFlow } from '../src/flow/linkedin_post_flow';
+import type { InvocationContext } from '@azure/functions';
+
+const context = { log: vi.fn() } as unknown as InvocationContext;
+
+function primeHappyPath() {
+	mocks.queryItems.mockResolvedValue([]);
+	mocks.generateResponse
+		.mockResolvedValueOnce(
+			JSON.stringify({
+				topic: 'AI in healthcare',
+				topic_description: 'How AI assists diagnosis',
+				research: 'background',
+			})
+		)
+		.mockResolvedValue('generated text');
+	mocks.generateImage.mockResolvedValue(Buffer.from('img'));
+	mocks.uploadImage.mockResolvedValue('https://blob/image.png');
+	mocks.uploadImageToLinkedIn.mockResolvedValue('urn:li:digitalmediaAsset:123');
+	mocks.postToLinkedIn.mockResolvedValue(undefined);
+	mocks.createItem.mockResolvedValue({});
+}
+
+describe('linkedInPostFlow', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		process.env.COSMOS_LINKEDIN_CONTAINER = 'LinkedInPosts';
+		primeHappyPath();
+	});
+
+	it('dry-run never posts to LinkedIn and never persists', async () => {
+		await linkedInPostFlow(context, {
+			triggerBy: 'preview',
+			post: false,
+			persist: false,
+			generateImage: true,
+		});
+
+		expect(mocks.postToLinkedIn).not.toHaveBeenCalled();
+		expect(mocks.uploadImageToLinkedIn).not.toHaveBeenCalled();
+		expect(mocks.createItem).not.toHaveBeenCalled();
+	});
+
+	it('full run posts to LinkedIn and persists to Cosmos', async () => {
+		await linkedInPostFlow(context, {
+			triggerBy: 'timer',
+			post: true,
+			persist: true,
+			generateImage: true,
+		});
+
+		expect(mocks.postToLinkedIn).toHaveBeenCalledTimes(1);
+		// The generated post text and the LinkedIn image asset must flow through.
+		expect(mocks.postToLinkedIn).toHaveBeenCalledWith(
+			'generated text',
+			'urn:li:digitalmediaAsset:123'
+		);
+		expect(mocks.createItem).toHaveBeenCalledTimes(1);
+		expect(mocks.createItem).toHaveBeenCalledWith(
+			expect.objectContaining({
+				topic: 'AI in healthcare',
+				linkedInPost: 'generated text',
+				imageAsset: 'urn:li:digitalmediaAsset:123',
+				triggerBy: 'timer',
+			})
+		);
+	});
+
+	it('still posts a text-only update when image generation fails', async () => {
+		mocks.generateImage.mockReset();
+		mocks.generateImage.mockRejectedValue(new Error('dalle down'));
+
+		await linkedInPostFlow(context, {
+			triggerBy: 'timer',
+			post: true,
+			persist: true,
+			generateImage: true,
+		});
+
+		// Image failure is swallowed; the post still goes out, without an image asset.
+		expect(mocks.uploadImageToLinkedIn).not.toHaveBeenCalled();
+		expect(mocks.postToLinkedIn).toHaveBeenCalledTimes(1);
+		expect(mocks.postToLinkedIn).toHaveBeenCalledWith('generated text', undefined);
+	});
+
+	it('skips image generation when generateImage is false', async () => {
+		await linkedInPostFlow(context, {
+			triggerBy: 'preview',
+			post: false,
+			persist: false,
+			generateImage: false,
+		});
+
+		expect(mocks.generateImage).not.toHaveBeenCalled();
+		expect(mocks.uploadImageToLinkedIn).not.toHaveBeenCalled();
+	});
+});

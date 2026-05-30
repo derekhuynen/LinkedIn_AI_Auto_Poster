@@ -1,0 +1,54 @@
+{
+  "name": "linkedin_ai_auto_poster",
+  "version": "2.0.0",
+  "author": "Derek Huynen",
+  "date": "2026-05-30",
+  "description": "An AI-driven solution for automating LinkedIn content creation and posting using Azure services.",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "clean": "rimraf dist",
+    "prestart": "npm run clean && npm run build",
+    "start": "func start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "postbuild": "node -e \"require('fs').cpSync('src/prompts','dist/src/prompts',{recursive:true})\""
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.4.1",
+    "@azure/functions": "^4.0.0",
+    "@azure/storage-blob": "^12.27.0",
+    "axios": "^1.9.0",
+    "openai": "^4.100.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^4.1.0"
+  },
+  "main": "dist/src/{index.js,functions/*.js}",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/derekhuynen/LinkedIn_AI_Auto_Poster.git"
+  },
+  "keywords": [
+    "Azure",
+    "LinkedIn",
+    "AI",
+    "Automation",
+    "OpenAI"
+  ],
+  "bugs": {
+    "url": "https://github.com/derekhuynen/LinkedIn_AI_Auto_Poster/issues"
+  },
+  "homepage": "https://github.com/derekhuynen/LinkedIn_AI_Auto_Poster#readme",
+  "contributors": [
+    {
+      "name": "Derek Huynen",
+      "url": "https://linkedin.com/in/derekhuynen"
+    }
+  ]
+}
