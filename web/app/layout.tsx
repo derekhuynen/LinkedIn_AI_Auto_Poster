@@ -25,7 +25,7 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
 	title: 'LinkedIn AI Auto Poster',
 	description:
-		'An AI content pipeline on Azure: GPT-4.1 and DALL-E 3 generate and publish LinkedIn posts on a schedule.',
+		'An AI content pipeline on Azure: gpt-5-mini and gpt-image-1 generate and publish LinkedIn posts on a schedule.',
 };
 
 export default function RootLayout({

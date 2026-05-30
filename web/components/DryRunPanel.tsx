@@ -102,7 +102,7 @@ function ResultSurface({ state }: { state: State }) {
 		return (
 			<div className="flex min-h-[20rem] items-center justify-center rounded-xl border border-dashed border-border bg-surface/40 p-8 text-center">
 				<p className="max-w-xs font-mono text-sm text-muted">
-					The generated post will appear here, image and all.
+					The generated post will appear here.
 				</p>
 			</div>
 		);
@@ -117,6 +117,9 @@ function ResultSurface({ state }: { state: State }) {
 					<div className="h-3 w-full animate-pulse rounded bg-surface-2" />
 					<div className="h-3 w-11/12 animate-pulse rounded bg-surface-2" />
 					<div className="h-3 w-4/5 animate-pulse rounded bg-surface-2" />
+					<p className="pt-1 font-mono text-[11px] text-muted">
+						{'// warming up the function and model; the first run can take a few seconds'}
+					</p>
 				</div>
 			</div>
 		);

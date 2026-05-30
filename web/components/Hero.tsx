@@ -33,8 +33,8 @@ export default function Hero() {
 					style={delay(180)}
 				>
 					A timer-triggered pipeline picks a fresh topic, writes the post with
-					GPT-4.1, paints a cover image with DALL-E 3, and publishes straight to
-					LinkedIn. Every run is archived to Cosmos DB.
+					gpt-5-mini, generates a cover image with gpt-image-1, and publishes
+					straight to LinkedIn. Every run is archived to Cosmos DB.
 				</p>
 
 				<div

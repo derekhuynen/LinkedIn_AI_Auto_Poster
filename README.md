@@ -1,6 +1,6 @@
 # LinkedIn AI Auto Poster
 
-An autonomous content pipeline on Azure that writes and publishes LinkedIn posts on a schedule. A timer-triggered Azure Function picks a fresh topic, drafts the post with GPT-4.1, generates a cover image with DALL-E 3, publishes to LinkedIn, and archives every run to Cosmos DB. A Next.js dashboard lets anyone browse what it has shipped and watch it generate a sample post live.
+An autonomous content pipeline on Azure that writes and publishes LinkedIn posts on a schedule. A timer-triggered Azure Function picks a fresh topic, drafts the post with gpt-5-mini, optionally generates a cover image with gpt-image-1, publishes to LinkedIn, and archives every run to Cosmos DB. A Next.js dashboard lets anyone browse what it has shipped and watch it generate a sample post live.
 
 [![API CI](https://github.com/derekhuynen/LinkedIn_AI_Auto_Poster/actions/workflows/main_auto-poster-function.yml/badge.svg)](https://github.com/derekhuynen/LinkedIn_AI_Auto_Poster/actions/workflows/main_auto-poster-function.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -27,8 +27,8 @@ npm run dev   # sample-data mode is on by default
 ## Features
 
 - **Scheduled auto-posting.** A timer-triggered Azure Function runs the whole pipeline on a cron schedule.
-- **AI topic and post generation.** GPT-4.1 picks a fresh topic (avoiding recent ones) and writes the post.
-- **DALL-E 3 cover images.** Each post gets a generated image, stored durably in Blob Storage.
+- **AI topic and post generation.** gpt-5-mini picks a fresh topic (avoiding recent ones) and writes the post.
+- **AI cover images (optional).** gpt-image-1 generates a cover image, stored durably in Blob Storage.
 - **Live dry-run, safely.** A public endpoint generates a sample post on demand, protected by a global daily cap, and provably never publishes or persists.
 - **Read-only gallery API.** A paginated feed of past posts with a server-side projection so no secrets leave the database.
 - **Durable archive.** Every run is written to Cosmos DB.
@@ -49,7 +49,7 @@ flowchart TB
         FLOW["linkedInPostFlow"]
     end
     subgraph Azure["Azure Services"]
-        AOAI["Azure OpenAI<br/>GPT-4.1 + DALL-E 3"]
+        AOAI["Azure OpenAI<br/>gpt-5-mini + gpt-image-1"]
         BLOB["Blob Storage"]
         COSMOS["Cosmos DB<br/>Posts + RateLimits"]
     end

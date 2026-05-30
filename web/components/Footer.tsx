@@ -7,7 +7,7 @@ export default function Footer() {
 				<div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
 					<p className="max-w-xl font-mono text-xs leading-relaxed text-muted">
 						{
-							'// Azure Functions (timer) -> GPT-4.1 + DALL-E 3 -> Blob Storage + Cosmos DB -> LinkedIn'
+							'// Azure Functions (timer) -> gpt-5-mini + gpt-image-1 -> Blob Storage + Cosmos DB -> LinkedIn'
 						}
 					</p>
 					<div className="flex items-center gap-5 text-sm">

@@ -56,7 +56,7 @@ Mirror `api/example.settings.json`. The Phase 2 additions are the last two rows.
 | `LINKEDIN_ACCESS_TOKEN`         | (secret)                                            | LinkedIn OAuth token                     |
 | `LINKEDIN_MEMBER_URN`           | `urn:li:person:<id>`                                | LinkedIn author URN                      |
 | `LINKEDIN_POST_SCHEDULE`        | `0 0 9 * * *`                                        | Timer cron (empty disables the timer)    |
-| `ENABLE_IMAGE_GENERATION`       | `true`                                               | Toggle DALL-E on the timer path          |
+| `ENABLE_IMAGE_GENERATION`       | `false`                                              | Toggle image generation (needs gpt-image-1) |
 | `ENABLE_LINKEDIN_POST`          | `true`                                               | Toggle publishing on the timer path      |
 
 For local development, copy `api/example.settings.json` to

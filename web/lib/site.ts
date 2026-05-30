@@ -4,8 +4,8 @@ export const GITHUB_URL =
 
 export const TECH_BADGES = [
 	'Azure Functions',
-	'GPT-4.1',
-	'DALL-E 3',
+	'gpt-5-mini',
+	'gpt-image-1',
 	'Cosmos DB',
 	'Next.js',
 ];
