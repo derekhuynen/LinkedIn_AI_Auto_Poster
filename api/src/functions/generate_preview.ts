@@ -55,6 +55,9 @@ export async function generatePreview(
 			};
 		}
 
+		// The cap unit is consumed above and intentionally NOT refunded if
+		// generation fails below: a failed attempt still spent OpenAI budget, and
+		// refunding would let a forced-failure loop bypass the cap.
 		const result = await linkedInPostFlow(context, {
 			triggerBy: 'preview',
 			post: false,

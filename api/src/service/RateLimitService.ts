@@ -63,6 +63,14 @@ export class RateLimitService {
 				return { allowed: false, count: current, remaining: 0 };
 			}
 
+			// Never write without an ETag to guard against: an unconditioned
+			// replace could let concurrent callers overspend the cap. A read of
+			// an existing Cosmos item always returns one, so a missing ETag is
+			// anomalous; re-read rather than risk an unguarded increment.
+			if (!etag) {
+				continue;
+			}
+
 			try {
 				await this.container
 					.item(id, id)
@@ -84,6 +92,8 @@ export class RateLimitService {
 			}
 		}
 
+		// Exhausted the retry budget under contention. Fail closed (deny) so the
+		// cap can never be exceeded; the cost is a rare false 429 under heavy load.
 		return { allowed: false, count: cap, remaining: 0 };
 	}
 
