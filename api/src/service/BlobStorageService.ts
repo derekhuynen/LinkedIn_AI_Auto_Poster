@@ -89,7 +89,7 @@ export class BlobStorageService {
 	 * @param {string} fileName - The name of the file
 	 * @returns {string} - The MIME type
 	 */
-	private getContentType(fileName: string): string {
+	getContentType(fileName: string): string {
 		const extension = fileName.split('.').pop()?.toLowerCase();
 		switch (extension) {
 			case 'jpg':

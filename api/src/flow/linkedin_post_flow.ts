@@ -32,15 +32,16 @@ type GenerateTopicPromptResponse = {
 	research: string;
 };
 
-function isGenerateTopicPromptResponse(
-	obj: any
+export function isGenerateTopicPromptResponse(
+	obj: unknown
 ): obj is GenerateTopicPromptResponse {
+	const o = obj as Record<string, unknown> | null;
 	return (
-		obj &&
-		typeof obj === 'object' &&
-		typeof obj.topic === 'string' &&
-		typeof obj.topic_description === 'string' &&
-		typeof obj.research === 'string'
+		!!o &&
+		typeof o === 'object' &&
+		typeof o.topic === 'string' &&
+		typeof o.topic_description === 'string' &&
+		typeof o.research === 'string'
 	);
 }
 
