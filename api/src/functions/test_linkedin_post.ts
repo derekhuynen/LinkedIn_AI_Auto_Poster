@@ -34,7 +34,12 @@ export async function testLinkedInPost(
 				},
 			};
 		}
-		const { topic, linkedInPost } = await linkedInPostFlow(context, 'http');
+		const { topic, linkedInPost } = await linkedInPostFlow(context, {
+			triggerBy: 'http',
+			post: process.env.ENABLE_LINKEDIN_POST === 'true',
+			persist: true,
+			generateImage: process.env.ENABLE_IMAGE_GENERATION === 'true',
+		});
 		context.log('LinkedIn post test tool completed successfully.');
 		return {
 			status: 200,

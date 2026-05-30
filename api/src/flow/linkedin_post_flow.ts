@@ -45,18 +45,29 @@ export function isGenerateTopicPromptResponse(
 	);
 }
 
+export interface LinkedInPostFlowOptions {
+	/** What triggered the run, stored for auditing (e.g. 'timer', 'preview'). */
+	triggerBy: string;
+	/** Publish the generated post to LinkedIn. Set false for dry-runs. */
+	post: boolean;
+	/** Save the result to the Cosmos posts feed. Set false for dry-runs. */
+	persist: boolean;
+	/** Run DALL-E image generation (and the image prompt step). */
+	generateImage: boolean;
+}
+
 /**
  * Orchestrates the workflow for generating and posting a LinkedIn post using Azure OpenAI, DALL-E, Blob Storage, and Cosmos DB.
  * Handles topic and content generation, image creation, LinkedIn posting, and Cosmos DB storage with robust error handling and retries.
  *
  * @param {InvocationContext} context - The Azure Functions invocation context for logging
- * @param {string} triggerBy - What triggered the workflow (e.g., 'timer', 'http')
+ * @param {LinkedInPostFlowOptions} options - Options controlling what the flow does
  * @returns {Promise<{topic: string, topicDescription: string, research: string, linkedInPost: string, createdAt: string, triggerBy: string, imageUrl?: string, blobStorageUrl?: string, imageAsset?: string, imagePrompt?: string}>} The workflow result and metadata
  * @throws {Error} If any critical step fails
  */
 export async function linkedInPostFlow(
 	context: InvocationContext,
-	triggerBy: string
+	options: LinkedInPostFlowOptions
 ): Promise<{
 	topic: string;
 	topicDescription: string;
@@ -70,6 +81,7 @@ export async function linkedInPostFlow(
 	imagePrompt?: string;
 }> {
 	const containerId = process.env.COSMOS_LINKEDIN_CONTAINER || '';
+	const { triggerBy } = options;
 
 	// Improved error handling and logging
 	if (!containerId) {
@@ -129,7 +141,7 @@ export async function linkedInPostFlow(
 		// Step 2: Generate LinkedIn post and image in parallel for better performance
 		let linkedInPost: string;
 		let imagePromptResponse: string = '';
-		if (process.env.ENABLE_IMAGE_PROMPT_GENERATION !== 'false') {
+		if (options.generateImage) {
 			[linkedInPost, imagePromptResponse] = await Promise.all([
 				withRetry(
 					() =>
@@ -174,7 +186,7 @@ export async function linkedInPostFlow(
 		let imageAsset: string | undefined;
 
 		try {
-			if (process.env.ENABLE_IMAGE_GENERATION === 'true') {
+			if (options.generateImage) {
 				context.log('Generating image with DALL-E 3...');
 				imageUrl = await withRetry(
 					() =>
@@ -234,7 +246,7 @@ export async function linkedInPostFlow(
 		}
 
 		// Step 4: Post to LinkedIn (toggle with a flag for local testing)
-		if (process.env.ENABLE_LINKEDIN_POST === 'true') {
+		if (options.post) {
 			await withRetry(
 				() => linkedinService.postToLinkedIn(linkedInPost, imageAsset),
 				3,
@@ -245,24 +257,26 @@ export async function linkedInPostFlow(
 			context.log('LinkedIn posting is disabled. Skipping Step 4.');
 		}
 		// Step 5: Save the LinkedIn post to Cosmos DB
-		await withRetry(
-			() =>
-				cosmosService.createItem({
-					topic: topicData.topic,
-					topicDescription: topicData.topic_description,
-					research: topicData.research,
-					linkedInPost: linkedInPost,
-					createdAt: createdAt,
-					triggerBy: triggerBy,
-					imageUrl: imageUrl,
-					blobStorageUrl: blobStorageUrl,
-					imageAsset: imageAsset,
-					imagePrompt: imagePromptResponse,
-				}),
-			3,
-			context,
-			'cosmos.createItem'
-		);
+		if (options.persist) {
+			await withRetry(
+				() =>
+					cosmosService.createItem({
+						topic: topicData.topic,
+						topicDescription: topicData.topic_description,
+						research: topicData.research,
+						linkedInPost: linkedInPost,
+						createdAt: createdAt,
+						triggerBy: triggerBy,
+						imageUrl: imageUrl,
+						blobStorageUrl: blobStorageUrl,
+						imageAsset: imageAsset,
+						imagePrompt: imagePromptResponse,
+					}),
+				3,
+				context,
+				'cosmos.createItem'
+			);
+		}
 		return {
 			topic: topicData.topic,
 			topicDescription: topicData.topic_description,
