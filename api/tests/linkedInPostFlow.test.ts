@@ -4,7 +4,6 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
 	generateResponse: vi.fn(),
 	generateImage: vi.fn(),
-	downloadImageAsBuffer: vi.fn(),
 	postToLinkedIn: vi.fn(),
 	uploadImageToLinkedIn: vi.fn(),
 	uploadImage: vi.fn(),
@@ -16,7 +15,6 @@ vi.mock('../src/service/OpenAiService', () => ({
 	OpenAiService: class {
 		generateResponse = mocks.generateResponse;
 		generateImage = mocks.generateImage;
-		downloadImageAsBuffer = mocks.downloadImageAsBuffer;
 	},
 }));
 
@@ -56,9 +54,8 @@ function primeHappyPath() {
 			})
 		)
 		.mockResolvedValue('generated text');
-	mocks.generateImage.mockResolvedValue('https://dalle/image.png');
-	mocks.downloadImageAsBuffer.mockResolvedValue(Buffer.from('img'));
-	mocks.uploadImage.mockResolvedValue('https://blob/image.jpg');
+	mocks.generateImage.mockResolvedValue(Buffer.from('img'));
+	mocks.uploadImage.mockResolvedValue('https://blob/image.png');
 	mocks.uploadImageToLinkedIn.mockResolvedValue('urn:li:digitalmediaAsset:123');
 	mocks.postToLinkedIn.mockResolvedValue(undefined);
 	mocks.createItem.mockResolvedValue({});

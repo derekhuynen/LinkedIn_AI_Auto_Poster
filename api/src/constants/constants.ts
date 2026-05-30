@@ -1,22 +1,30 @@
 export enum OpenAIModels {
-	GPT_4_1 = 'GPT_4_1',
-	DALLE_3 = 'DALLE_3',
+	/** Text model for topic and post generation. */
+	GPT = 'GPT',
+	/** Image model for cover generation. */
+	IMAGE = 'IMAGE',
 }
 
+/**
+ * Resolves the Azure deployment name for a model from the environment. On Azure
+ * OpenAI the request is routed by deployment name, so modelName === deployment.
+ * Defaults track current models (gpt-5-mini for text, gpt-image-1 for images).
+ */
 export function getModelDetails(model: OpenAIModels): {
 	modelName: string;
 	deployment: string;
 } {
-	// Get environment variables for deployments if available, otherwise use defaults
-	const gpt4Deployment = process.env.AZURE_OPENAI_GPT_DEPLOYMENT || 'gpt-4.1';
-	const dalleDeployment =
-		process.env.AZURE_OPENAI_DALLE_DEPLOYMENT || 'dall-e-3';
-
 	switch (model) {
-		case OpenAIModels.GPT_4_1:
-			return { modelName: 'gpt-4.1', deployment: gpt4Deployment };
-		case OpenAIModels.DALLE_3:
-			return { modelName: 'dall-e-3', deployment: dalleDeployment };
+		case OpenAIModels.GPT: {
+			const deployment =
+				process.env.AZURE_OPENAI_GPT_DEPLOYMENT || 'gpt-5-mini';
+			return { modelName: deployment, deployment };
+		}
+		case OpenAIModels.IMAGE: {
+			const deployment =
+				process.env.AZURE_OPENAI_IMAGE_DEPLOYMENT || 'gpt-image-1';
+			return { modelName: deployment, deployment };
+		}
 		default:
 			throw new Error('Unsupported model');
 	}
@@ -54,4 +62,4 @@ export function getRateLimitContainerId(): string {
 	return process.env.COSMOS_RATELIMIT_CONTAINER || 'RateLimits';
 }
 
-export * from './dalle3_config';
+export * from './image_config';

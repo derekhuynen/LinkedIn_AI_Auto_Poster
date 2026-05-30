@@ -91,7 +91,7 @@ export async function linkedInPostFlow(
 		throw new Error(errorMessage);
 	}
 
-	const { modelName, deployment } = getModelDetails(OpenAIModels.GPT_4_1);
+	const { modelName, deployment } = getModelDetails(OpenAIModels.GPT);
 	const openAiService = new OpenAiService(modelName, deployment);
 	const linkedinService = new LinkedinService();
 	const cosmosService = new CosmosService({
@@ -187,47 +187,41 @@ export async function linkedInPostFlow(
 
 		try {
 			if (options.generateImage) {
-				context.log('Generating image with DALL-E 3...');
-				imageUrl = await withRetry(
+				context.log('Generating image with the image model...');
+				const imageBuffer = await withRetry(
 					() =>
 						openAiService.generateImage({
 							prompt: imagePromptResponse,
 							size: LINKEDIN_IMAGE_DEFAULTS.size,
 							quality: LINKEDIN_IMAGE_DEFAULTS.quality,
-							style: LINKEDIN_IMAGE_DEFAULTS.style,
 						}),
 					3,
 					context,
 					'openai.generateImage'
 				);
 
-				if (imageUrl) {
-					const imageBuffer = await withRetry(
-						() => openAiService.downloadImageAsBuffer(imageUrl!),
-						3,
-						context,
-						'openai.downloadImageAsBuffer'
-					);
-
+				if (imageBuffer) {
 					context.log('Uploading image to Azure Blob Storage...');
 					blobStorageUrl = await withRetry(
 						() =>
 							blobStorageService.uploadImage(
 								imageBuffer,
-								`linkedin-post-${Date.now()}.jpg`
+								`linkedin-post-${Date.now()}.png`
 							),
 						3,
 						context,
 						'blob.uploadImage'
 					);
 					context.log('Image uploaded to Blob Storage:', blobStorageUrl);
+					// The durable blob URL is the canonical image URL now.
+					imageUrl = blobStorageUrl;
 
 					if (options.post) {
 						imageAsset = await withRetry(
 							() =>
 								linkedinService.uploadImageToLinkedIn(
 									imageBuffer,
-									'linkedin-post-image.jpg'
+									'linkedin-post-image.png'
 								),
 							3,
 							context,

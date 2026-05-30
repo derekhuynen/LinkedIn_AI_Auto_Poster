@@ -59,11 +59,11 @@ export class OpenAiService {
 					role: msg.role,
 					content: msg.content,
 				})),
-				max_completion_tokens: 800,
-				temperature: 1,
-				top_p: 1,
-				frequency_penalty: 0,
-				presence_penalty: 0,
+				// gpt-5 models are reasoning models: reasoning tokens count against the
+				// budget, so allow ample headroom and keep reasoning light for what is a
+				// creative writing task (not a reasoning one).
+				max_completion_tokens: 2000,
+				reasoning_effort: 'low',
 				model,
 			});
 			return response.choices[0]?.message?.content || '';
@@ -145,122 +145,83 @@ export class OpenAiService {
 	}
 
 	/**
-	 * Generates an image using DALL-E 3 via Azure OpenAI.
+	 * Generates a cover image with gpt-image-1 via Azure OpenAI and returns the
+	 * raw PNG bytes. (The image API returns base64 data, not a URL.)
 	 * @param {object} params - The parameters for image generation.
 	 * @param {string} params.prompt - The image generation prompt.
-	 * @param {'1024x1024' | '1792x1024' | '1024x1792'} [params.size] - Image size.
-	 * @param {'standard' | 'hd'} [params.quality] - Image quality.
-	 * @param {'vivid' | 'natural'} [params.style] - Image style.
-	 * @returns {Promise<string>} The URL of the generated image.
+	 * @param {'1024x1024' | '1536x1024' | '1024x1536'} [params.size] - Image size.
+	 * @param {'low' | 'medium' | 'high'} [params.quality] - Image quality.
+	 * @returns {Promise<Buffer>} The generated image bytes.
 	 * @throws {Error} If image generation fails.
 	 */
 	async generateImage({
 		prompt,
 		size = '1024x1024',
-		quality = 'standard',
-		style = 'vivid',
+		quality = 'high',
 	}: {
 		prompt: string;
-		size?: '1024x1024' | '1792x1024' | '1024x1792';
-		quality?: 'standard' | 'hd';
-		style?: 'vivid' | 'natural';
-	}): Promise<string> {
+		size?: '1024x1024' | '1536x1024' | '1024x1536';
+		quality?: 'low' | 'medium' | 'high';
+	}): Promise<Buffer> {
 		try {
-			// Get DALL-E 3 model details from constants
-			const dalleDetails = getModelDetails(OpenAIModels.DALLE_3);
+			const { deployment } = getModelDetails(OpenAIModels.IMAGE);
 
-			// DALL-E 3 (East region) configuration, validated from environment.
-			const eastEndpoint = process.env.AZURE_OPENAI_ENDPOINT_EAST;
-			const eastApiVersion =
-				process.env.AZURE_OPENAI_API_VERSION_EAST || '2024-02-01';
-			const dalleDeployment =
-				process.env.AZURE_OPENAI_DALLE_DEPLOYMENT || 'dall-e-3';
-			const eastApiKey =
-				process.env.AZURE_OPENAI_API_KEY_EAST ||
+			// The image model can live on a different resource/region than text;
+			// fall back to the text (West) resource if no dedicated image config.
+			const imageEndpoint =
+				process.env.AZURE_OPENAI_IMAGE_ENDPOINT ||
+				process.env.AZURE_OPENAI_ENDPOINT_WEST;
+			const imageApiVersion =
+				process.env.AZURE_OPENAI_IMAGE_API_VERSION || '2025-04-01-preview';
+			const imageApiKey =
+				process.env.AZURE_OPENAI_IMAGE_API_KEY ||
 				process.env.AZURE_OPENAI_API_KEY_WEST;
 
-			if (!eastEndpoint || !eastApiKey) {
+			if (!imageEndpoint || !imageApiKey) {
 				const missing = [
-					!eastEndpoint && 'AZURE_OPENAI_ENDPOINT_EAST',
-					!eastApiKey &&
-						'AZURE_OPENAI_API_KEY_EAST or AZURE_OPENAI_API_KEY_WEST',
+					!imageEndpoint && 'AZURE_OPENAI_IMAGE_ENDPOINT (or _WEST)',
+					!imageApiKey && 'AZURE_OPENAI_IMAGE_API_KEY (or _WEST)',
 				]
 					.filter(Boolean)
 					.join(', ');
 				throw new Error(
-					`Missing required environment variables for DALL-E 3: ${missing}`
+					`Missing required environment variables for image generation: ${missing}`
 				);
 			}
 
-			// Create a new client instance with East region's DALL-E 3 configuration
-			const dalleClient = new AzureOpenAI({
-				endpoint: eastEndpoint,
-				apiKey: eastApiKey,
-				apiVersion: eastApiVersion,
-				deployment: dalleDeployment,
+			const imageClient = new AzureOpenAI({
+				endpoint: imageEndpoint,
+				apiKey: imageApiKey,
+				apiVersion: imageApiVersion,
+				deployment,
 			});
 
 			console.log(
-				`Generating image with DALL-E 3 (${dalleDetails.modelName}): size=${size}, quality=${quality}, style=${style}, prompt=${prompt.length} chars`
+				`Generating image with ${deployment}: size=${size}, quality=${quality}, prompt=${prompt.length} chars`
 			);
 
-			const response = await dalleClient.images.generate({
-				model: dalleDetails.modelName,
-				prompt: prompt,
+			const response = await imageClient.images.generate({
+				model: deployment,
+				prompt,
 				n: 1,
-				size: size,
-				quality: quality,
-				style: style,
+				// gpt-image-1 accepts sizes/quality the SDK's type union lags behind.
+				size: size as never,
+				quality: quality as never,
 			});
-			if (!response.data) {
-				throw new Error('No data returned from DALL-E 3');
-			}
-			const imageUrl = response.data[0]?.url;
-			if (!imageUrl) {
-				throw new Error('No image URL returned from DALL-E 3');
-			}
 
-			console.log(
-				'Image generated successfully:',
-				imageUrl.substring(0, 60) + '...'
-			);
-			return imageUrl;
+			const b64 = response.data?.[0]?.b64_json;
+			if (!b64) {
+				throw new Error('No image data returned from the image model');
+			}
+			return Buffer.from(b64, 'base64');
 		} catch (error: any) {
-			console.error('Error generating image with DALL-E 3:', {
+			console.error('Error generating image:', {
 				error: error.message,
 				stack: error.stack,
-				prompt,
 				size,
 				quality,
-				style,
 			});
 			throw new Error(`Failed to generate image: ${error.message}`);
-		}
-	}
-
-	/**
-	 * Downloads an image from a URL and returns it as a buffer.
-	 * @param {string} imageUrl - The URL of the image to download.
-	 * @returns {Promise<Buffer>} The image data as a buffer.
-	 * @throws {Error} If download fails.
-	 */
-	async downloadImageAsBuffer(imageUrl: string): Promise<Buffer> {
-		try {
-			const response = await fetch(imageUrl);
-			if (!response.ok) {
-				throw new Error(
-					`Failed to download image: ${response.status} ${response.statusText}`
-				);
-			}
-
-			const arrayBuffer = await response.arrayBuffer();
-			return Buffer.from(arrayBuffer);
-		} catch (error: any) {
-			console.error('Error downloading image:', {
-				error: error.message,
-				imageUrl,
-			});
-			throw new Error(`Failed to download image: ${error.message}`);
 		}
 	}
 }

@@ -8,14 +8,14 @@
 	"seedGallery": true,
 	"enableImageGeneration": false,
 	"openai": {
-		"endpointWest": "https://<your-west-resource>.openai.azure.com/",
-		"apiKeyWest": "<your-west-key>",
+		"endpointWest": "https://<your-resource>.openai.azure.com/",
+		"apiKeyWest": "<your-key>",
 		"apiVersionWest": "2025-01-01-preview",
-		"gptDeployment": "gpt-4.1",
-		"endpointEast": "https://<your-east-resource>.openai.azure.com/",
-		"apiKeyEast": "<your-east-key>",
-		"apiVersionEast": "2024-02-01",
-		"dalleDeployment": "dall-e-3"
+		"gptDeployment": "gpt-5-mini",
+		"imageEndpoint": "https://<your-image-resource>.openai.azure.com/",
+		"imageApiKey": "<your-image-key>",
+		"imageApiVersion": "2025-04-01-preview",
+		"imageDeployment": "gpt-image-1"
 	},
 	"linkedin": {
 		"accessToken": "",

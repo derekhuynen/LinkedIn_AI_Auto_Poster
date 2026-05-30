@@ -36,14 +36,14 @@ Mirror `api/example.settings.json`. The Phase 2 additions are the last two rows.
 
 | Name                            | Example                                             | Purpose                                  |
 | ------------------------------- | --------------------------------------------------- | ---------------------------------------- |
-| `AZURE_OPENAI_API_KEY_WEST`     | (secret)                                            | GPT-4.1 key                              |
-| `AZURE_OPENAI_ENDPOINT_WEST`    | `https://<res>.openai.azure.com/`                   | GPT-4.1 endpoint                         |
-| `AZURE_OPENAI_API_VERSION_WEST` | `2025-01-01-preview`                                | GPT-4.1 API version                      |
-| `AZURE_OPENAI_GPT_DEPLOYMENT`   | `gpt-4.1`                                            | GPT-4.1 deployment name                  |
-| `AZURE_OPENAI_API_KEY_EAST`     | (secret)                                            | DALL-E 3 key                             |
-| `AZURE_OPENAI_ENDPOINT_EAST`    | `https://<res>.openai.azure.com/`                   | DALL-E 3 endpoint (required, no default) |
-| `AZURE_OPENAI_API_VERSION_EAST` | `2024-02-01`                                        | DALL-E 3 API version                     |
-| `AZURE_OPENAI_DALLE_DEPLOYMENT` | `dall-e-3`                                           | DALL-E 3 deployment name                 |
+| `AZURE_OPENAI_API_KEY_WEST`     | (secret)                                            | Text model key                           |
+| `AZURE_OPENAI_ENDPOINT_WEST`    | `https://<res>.openai.azure.com/`                   | Text model endpoint                      |
+| `AZURE_OPENAI_API_VERSION_WEST` | `2025-01-01-preview`                                | Text model API version                   |
+| `AZURE_OPENAI_GPT_DEPLOYMENT`   | `gpt-5-mini`                                         | Text deployment name                     |
+| `AZURE_OPENAI_IMAGE_DEPLOYMENT` | `gpt-image-1`                                        | Image deployment name (if images on)     |
+| `AZURE_OPENAI_IMAGE_ENDPOINT`   | `https://<res>.openai.azure.com/`                   | Image endpoint (falls back to WEST)      |
+| `AZURE_OPENAI_IMAGE_API_KEY`    | (secret)                                            | Image key (falls back to WEST)           |
+| `AZURE_OPENAI_IMAGE_API_VERSION`| `2025-04-01-preview`                                | Image API version                        |
 | `AZURE_STORAGE_CONNECTION_STRING` | (secret)                                          | Blob Storage connection                  |
 | `AZURE_STORAGE_CONTAINER_NAME`  | `linkedin-images`                                   | Image container                          |
 | `COSMOS_ENDPOINT`               | `https://<acct>.documents.azure.com:443/`           | Cosmos endpoint                          |

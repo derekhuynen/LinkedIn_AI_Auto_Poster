@@ -42,7 +42,7 @@ export async function testImageGeneration(
 			};
 		}
 
-		const { modelName, deployment } = getModelDetails(OpenAIModels.GPT_4_1);
+		const { modelName, deployment } = getModelDetails(OpenAIModels.GPT);
 		const openAiService = new OpenAiService(modelName, deployment);
 		const linkedinService = new LinkedinService();
 
@@ -64,32 +64,25 @@ export async function testImageGeneration(
 
 		context.log('Generated image prompt:', imagePromptResponse);
 
-		const imageUrl = await withRetry(
+		const imageBuffer = await withRetry(
 			() =>
 				openAiService.generateImage({
 					prompt: imagePromptResponse,
-					size: '1792x1024',
-					quality: 'standard',
-					style: 'vivid',
+					size: '1536x1024',
+					quality: 'high',
 				}),
 			3,
 			context,
 			'openai.generateImage'
 		);
 
-		context.log('Generated image URL:', imageUrl);
+		context.log('Generated image bytes:', imageBuffer.length);
 
 		let imageAsset: string | undefined;
 		if (process.env.ENABLE_LINKEDIN_POST === 'true') {
-			const imageBuffer = await withRetry(
-				() => openAiService.downloadImageAsBuffer(imageUrl),
-				3,
-				context,
-				'openai.downloadImageAsBuffer'
-			);
 			imageAsset = await withRetry(
 				() =>
-					linkedinService.uploadImageToLinkedIn(imageBuffer, 'test-image.jpg'),
+					linkedinService.uploadImageToLinkedIn(imageBuffer, 'test-image.png'),
 				3,
 				context,
 				'linkedin.uploadImageToLinkedIn'
@@ -105,7 +98,7 @@ export async function testImageGeneration(
 				data: {
 					topic: testTopic,
 					imagePrompt: imagePromptResponse,
-					imageUrl: imageUrl,
+					imageBytes: imageBuffer.length,
 					imageAsset: imageAsset,
 				},
 			},
