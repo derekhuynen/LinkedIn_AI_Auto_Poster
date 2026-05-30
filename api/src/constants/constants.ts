@@ -57,6 +57,13 @@ export function getDryRunDailyCap(): number {
 	return Number.isFinite(parsed) && parsed > 0 ? parsed : 50;
 }
 
+/** Per-IP hourly cap on /api/preview dry-runs (abuse protection). */
+export function getDryRunPerIpHourlyCap(): number {
+	const raw = process.env.DRYRUN_PER_IP_HOURLY_CAP;
+	const parsed = raw ? parseInt(raw, 10) : NaN;
+	return Number.isFinite(parsed) && parsed > 0 ? parsed : 5;
+}
+
 /** Cosmos container holding per-day dry-run counters. */
 export function getRateLimitContainerId(): string {
 	return process.env.COSMOS_RATELIMIT_CONTAINER || 'RateLimits';

@@ -148,8 +148,10 @@ Invoke-Native 'az' @('cosmosdb', 'create', '-n', $cosmosName, '-g', $rg,
 	'--capabilities', 'EnableServerless', '--default-consistency-level', 'Session', '-o', 'none') | Out-Null
 Invoke-Native 'az' @('cosmosdb', 'sql', 'database', 'create', '-a', $cosmosName, '-g', $rg, '-n', $dbName, '-o', 'none') | Out-Null
 foreach ($ctr in @($postsCtr, $rateCtr)) {
-	Invoke-Native 'az' @('cosmosdb', 'sql', 'container', 'create', '-a', $cosmosName, '-g', $rg,
-		'-d', $dbName, '-n', $ctr, '--partition-key-path', '/id', '-o', 'none') | Out-Null
+	# RateLimits enables TTL (-1 = honor per-item ttl) so per-IP windows self-clean.
+	$ttlArg = if ($ctr -eq $rateCtr) { @('--ttl=-1') } else { @() }
+	Invoke-Native 'az' (@('cosmosdb', 'sql', 'container', 'create', '-a', $cosmosName, '-g', $rg,
+			'-d', $dbName, '-n', $ctr, '--partition-key-path', '/id', '-o', 'none') + $ttlArg) | Out-Null
 }
 $cosmosKey = (Invoke-Native 'az' @('cosmosdb', 'keys', 'list', '-n', $cosmosName, '-g', $rg,
 	'--query', 'primaryMasterKey', '-o', 'tsv') -Quiet).Trim()

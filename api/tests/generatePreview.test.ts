@@ -19,7 +19,12 @@ import { generatePreview } from '../src/functions/generate_preview';
 import type { HttpRequest, InvocationContext } from '@azure/functions';
 
 const context = { log: vi.fn() } as unknown as InvocationContext;
-const request = {} as HttpRequest;
+const request = {
+	headers: { get: () => '203.0.113.7' },
+} as unknown as HttpRequest;
+
+const ALLOWED = { allowed: true, count: 1, remaining: 49 };
+const BLOCKED = { allowed: false, count: 50, remaining: 0 };
 
 describe('generatePreview', () => {
 	beforeEach(() => {
@@ -28,28 +33,36 @@ describe('generatePreview', () => {
 		process.env.ENABLE_IMAGE_GENERATION = 'true';
 	});
 
-	it('returns 429 and does not generate when the cap is reached', async () => {
-		mocks.checkAndIncrement.mockResolvedValue({
-			allowed: false,
-			count: 50,
-			remaining: 0,
-		});
+	it('returns 429 (and does not generate) when the per-IP hourly limit is hit', async () => {
+		// First call is the per-IP check.
+		mocks.checkAndIncrement.mockResolvedValueOnce(BLOCKED);
 
 		const response = await generatePreview(request, context);
 
 		expect(response.status).toBe(429);
 		expect(mocks.linkedInPostFlow).not.toHaveBeenCalled();
 		const body = response.jsonBody as { error: string; resetsAt: string };
-		expect(body.error).toBeDefined();
+		expect(body.error).toMatch(/too many requests/i);
+		expect(body.resetsAt).toBeDefined();
+	});
+
+	it('returns 429 (and does not generate) when the global daily cap is reached', async () => {
+		// Per-IP passes, global daily cap is hit.
+		mocks.checkAndIncrement
+			.mockResolvedValueOnce(ALLOWED)
+			.mockResolvedValueOnce(BLOCKED);
+
+		const response = await generatePreview(request, context);
+
+		expect(response.status).toBe(429);
+		expect(mocks.linkedInPostFlow).not.toHaveBeenCalled();
+		const body = response.jsonBody as { error: string; resetsAt: string };
+		expect(body.error).toMatch(/daily demo limit/i);
 		expect(body.resetsAt).toBeDefined();
 	});
 
 	it('runs a dry-run and returns the preview with remaining quota', async () => {
-		mocks.checkAndIncrement.mockResolvedValue({
-			allowed: true,
-			count: 1,
-			remaining: 49,
-		});
+		mocks.checkAndIncrement.mockResolvedValue(ALLOWED);
 		mocks.linkedInPostFlow.mockResolvedValue({
 			topic: 'AI in healthcare',
 			topicDescription: 'desc',
@@ -85,11 +98,7 @@ describe('generatePreview', () => {
 	});
 
 	it('returns 500 when generation fails after the cap was consumed', async () => {
-		mocks.checkAndIncrement.mockResolvedValue({
-			allowed: true,
-			count: 1,
-			remaining: 49,
-		});
+		mocks.checkAndIncrement.mockResolvedValue(ALLOWED);
 		mocks.linkedInPostFlow.mockRejectedValue(new Error('openai down'));
 
 		const response = await generatePreview(request, context);

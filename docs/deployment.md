@@ -51,7 +51,8 @@ Mirror `api/example.settings.json`. The Phase 2 additions are the last two rows.
 | `COSMOS_DATABASE_ID`            | `AutoPoster`                                         | Cosmos database                          |
 | `COSMOS_LINKEDIN_CONTAINER`     | `LinkedInPosts`                                      | Posts container                          |
 | `COSMOS_RATELIMIT_CONTAINER`    | `RateLimits`                                          | Dry-run counter container                |
-| `DRYRUN_DAILY_CAP`              | `50`                                                 | Max dry-runs per UTC day                 |
+| `DRYRUN_DAILY_CAP`              | `50`                                                 | Max dry-runs per UTC day (global)        |
+| `DRYRUN_PER_IP_HOURLY_CAP`      | `5`                                                  | Max dry-runs per IP per hour             |
 | `LINKEDIN_ACCESS_TOKEN`         | (secret)                                            | LinkedIn OAuth token                     |
 | `LINKEDIN_MEMBER_URN`           | `urn:li:person:<id>`                                | LinkedIn author URN                      |
 | `LINKEDIN_POST_SCHEDULE`        | `0 0 9 * * *`                                        | Timer cron (empty disables the timer)    |

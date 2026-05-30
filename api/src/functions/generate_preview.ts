@@ -4,13 +4,30 @@ import {
 	HttpResponseInit,
 	InvocationContext,
 } from '@azure/functions';
+import { createHash } from 'crypto';
 import { RateLimitService } from '../service/RateLimitService';
 import { linkedInPostFlow } from '../flow/linkedin_post_flow';
-import { getDryRunDailyCap } from '../constants/constants';
+import {
+	getDryRunDailyCap,
+	getDryRunPerIpHourlyCap,
+} from '../constants/constants';
 
 /** UTC `YYYY-MM-DD` for the given date. */
 function utcDay(date: Date): string {
 	return date.toISOString().slice(0, 10);
+}
+
+/** UTC `YYYY-MM-DDTHH` window key for per-IP hourly limiting. */
+function utcHour(date: Date): string {
+	return date.toISOString().slice(0, 13);
+}
+
+/** A privacy-preserving per-IP key (hashed; raw IP is never stored). */
+function clientIpKey(request: HttpRequest, date: Date): string {
+	const fwd = request.headers.get('x-forwarded-for') || '';
+	const ip = fwd.split(',')[0].trim() || 'unknown';
+	const hash = createHash('sha256').update(ip).digest('hex').slice(0, 16);
+	return `ip-${hash}-${utcHour(date)}`;
 }
 
 /** ISO timestamp for the next UTC midnight after `date` (when the cap resets). */
@@ -43,7 +60,35 @@ export async function generatePreview(
 
 	try {
 		const rateLimiter = new RateLimitService();
-		const limit = await rateLimiter.checkAndIncrement(utcDay(now), cap);
+
+		// Per-IP hourly limit first, so one visitor cannot exhaust the global cap.
+		// The counter is keyed to the current UTC hour and self-expires via TTL.
+		const perIp = await rateLimiter.checkAndIncrement(
+			clientIpKey(request, now),
+			getDryRunPerIpHourlyCap(),
+			2 * 60 * 60
+		);
+		if (!perIp.allowed) {
+			return {
+				status: 429,
+				jsonBody: {
+					error: 'Too many requests from your network. Please try again shortly.',
+					resetsAt: new Date(
+						Date.UTC(
+							now.getUTCFullYear(),
+							now.getUTCMonth(),
+							now.getUTCDate(),
+							now.getUTCHours() + 1
+						)
+					).toISOString(),
+				},
+			};
+		}
+
+		const limit = await rateLimiter.checkAndIncrement(
+			`dryrun-${utcDay(now)}`,
+			cap
+		);
 
 		if (!limit.allowed) {
 			return {

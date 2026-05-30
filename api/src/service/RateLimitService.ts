@@ -8,10 +8,12 @@ export interface RateLimitResult {
 	remaining: number;
 }
 
-/** One counter document per UTC day. */
+/** A counter document (per-day global, or per-IP window). */
 interface CounterDoc {
 	id: string;
 	count: number;
+	/** Cosmos time-to-live in seconds; lets short-lived per-IP counters self-clean. */
+	ttl?: number;
 }
 
 /**
@@ -47,16 +49,19 @@ export class RateLimitService {
 	}
 
 	/**
-	 * Atomically checks the day's counter against the cap and, if under, increments it.
-	 * @param day - UTC date string `YYYY-MM-DD`.
-	 * @param cap - Maximum allowed increments for the day.
+	 * Atomically checks a counter against a cap and, if under, increments it.
+	 * @param id - The counter document id (e.g. `dryrun-2026-05-30` or `ip-<hash>-<hour>`).
+	 * @param cap - Maximum allowed increments for this counter.
+	 * @param ttlSeconds - Optional Cosmos TTL so short-lived counters (per-IP windows) self-clean.
 	 * @returns allowed=false (with remaining 0) if the cap is reached, else allowed=true with the new count.
 	 */
-	async checkAndIncrement(day: string, cap: number): Promise<RateLimitResult> {
-		const id = `dryrun-${day}`;
-
+	async checkAndIncrement(
+		id: string,
+		cap: number,
+		ttlSeconds?: number
+	): Promise<RateLimitResult> {
 		for (let attempt = 0; attempt < 5; attempt++) {
-			const { resource, etag } = await this.readOrCreate(id);
+			const { resource, etag } = await this.readOrCreate(id, ttlSeconds);
 			const current = resource.count;
 
 			if (current >= cap) {
@@ -75,7 +80,7 @@ export class RateLimitService {
 				await this.container
 					.item(id, id)
 					.replace<CounterDoc>(
-						{ id, count: current + 1 },
+						{ id, count: current + 1, ...(resource.ttl ? { ttl: resource.ttl } : {}) },
 						{ accessCondition: { type: 'IfMatch', condition: etag } }
 					);
 				const newCount = current + 1;
@@ -97,9 +102,10 @@ export class RateLimitService {
 		return { allowed: false, count: cap, remaining: 0 };
 	}
 
-	/** Reads the counter, creating a fresh `{ count: 0 }` doc if today's does not exist yet. */
+	/** Reads the counter, creating a fresh `{ count: 0 }` doc if it does not exist yet. */
 	private async readOrCreate(
-		id: string
+		id: string,
+		ttlSeconds?: number
 	): Promise<{ resource: CounterDoc; etag: string }> {
 		const { resource, etag } = await this.container
 			.item(id, id)
@@ -110,7 +116,11 @@ export class RateLimitService {
 		}
 
 		try {
-			await this.container.items.create<CounterDoc>({ id, count: 0 });
+			await this.container.items.create<CounterDoc>({
+				id,
+				count: 0,
+				...(ttlSeconds ? { ttl: ttlSeconds } : {}),
+			});
 		} catch (error: any) {
 			if (error?.code !== 409) {
 				throw error;
