@@ -33,7 +33,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/linkedin_ai_auto_poster.git"
+    "url": "https://github.com/derekhuynen/LinkedIn_AI_Auto_Poster.git"
   },
   "keywords": [
     "Azure",
@@ -43,13 +43,12 @@
     "OpenAI"
   ],
   "bugs": {
-    "url": "https://github.com/your-username/linkedin_ai_auto_poster/issues"
+    "url": "https://github.com/derekhuynen/LinkedIn_AI_Auto_Poster/issues"
   },
-  "homepage": "https://github.com/your-username/linkedin_ai_auto_poster#readme",
+  "homepage": "https://github.com/derekhuynen/LinkedIn_AI_Auto_Poster#readme",
   "contributors": [
     {
       "name": "Derek Huynen",
-      "email": "derek@example.com",
       "url": "https://linkedin.com/in/derekhuynen"
     }
   ]
