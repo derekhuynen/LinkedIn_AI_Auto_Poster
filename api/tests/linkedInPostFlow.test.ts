@@ -13,31 +13,31 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('../src/service/OpenAiService', () => ({
-	OpenAiService: vi.fn(() => ({
-		generateResponse: mocks.generateResponse,
-		generateImage: mocks.generateImage,
-		downloadImageAsBuffer: mocks.downloadImageAsBuffer,
-	})),
+	OpenAiService: class {
+		generateResponse = mocks.generateResponse;
+		generateImage = mocks.generateImage;
+		downloadImageAsBuffer = mocks.downloadImageAsBuffer;
+	},
 }));
 
 vi.mock('../src/service/LinkedinService', () => ({
-	default: vi.fn(() => ({
-		postToLinkedIn: mocks.postToLinkedIn,
-		uploadImageToLinkedIn: mocks.uploadImageToLinkedIn,
-	})),
+	default: class {
+		postToLinkedIn = mocks.postToLinkedIn;
+		uploadImageToLinkedIn = mocks.uploadImageToLinkedIn;
+	},
 }));
 
 vi.mock('../src/service/CosmosService', () => ({
-	CosmosService: vi.fn(() => ({
-		queryItems: mocks.queryItems,
-		createItem: mocks.createItem,
-	})),
+	CosmosService: class {
+		queryItems = mocks.queryItems;
+		createItem = mocks.createItem;
+	},
 }));
 
 vi.mock('../src/service/BlobStorageService', () => ({
-	BlobStorageService: vi.fn(() => ({
-		uploadImage: mocks.uploadImage,
-	})),
+	BlobStorageService: class {
+		uploadImage = mocks.uploadImage;
+	},
 }));
 
 import { linkedInPostFlow } from '../src/flow/linkedin_post_flow';

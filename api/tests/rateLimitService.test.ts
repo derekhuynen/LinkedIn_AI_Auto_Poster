@@ -16,9 +16,11 @@ vi.mock('@azure/cosmos', () => {
 		items: { create: mocks.create },
 	};
 	return {
-		CosmosClient: vi.fn(() => ({
-			database: () => ({ container: () => containerApi }),
-		})),
+		CosmosClient: class {
+			database() {
+				return { container: () => containerApi };
+			}
+		},
 	};
 });
 

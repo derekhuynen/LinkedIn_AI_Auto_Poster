@@ -6,9 +6,9 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('../src/service/RateLimitService', () => ({
-	RateLimitService: vi.fn(() => ({
-		checkAndIncrement: mocks.checkAndIncrement,
-	})),
+	RateLimitService: class {
+		checkAndIncrement = mocks.checkAndIncrement;
+	},
 }));
 
 vi.mock('../src/flow/linkedin_post_flow', () => ({

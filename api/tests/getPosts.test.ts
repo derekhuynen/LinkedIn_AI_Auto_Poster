@@ -5,9 +5,9 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('../src/service/CosmosService', () => ({
-	CosmosService: vi.fn(() => ({
-		queryItemsWithPagination: mocks.queryItemsWithPagination,
-	})),
+	CosmosService: class {
+		queryItemsWithPagination = mocks.queryItemsWithPagination;
+	},
 }));
 
 import { getPosts } from '../src/functions/get_posts';

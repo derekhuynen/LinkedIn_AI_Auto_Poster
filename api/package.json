@@ -13,7 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "postbuild": "cpx \"src/prompts/*.md\" dist/src/prompts/"
+    "postbuild": "node -e \"require('fs').cpSync('src/prompts','dist/src/prompts',{recursive:true})\""
   },
   "dependencies": {
     "@azure/cosmos": "^4.4.1",
@@ -24,10 +24,9 @@
   },
   "devDependencies": {
     "@types/node": "^20.x",
-    "cpx": "^1.5.0",
     "rimraf": "^5.0.0",
     "typescript": "^5.4.0",
-    "vitest": "^2.1.0"
+    "vitest": "^4.1.0"
   },
   "main": "dist/src/{index.js,functions/*.js}",
   "license": "MIT",
