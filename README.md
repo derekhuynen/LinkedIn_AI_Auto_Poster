@@ -125,6 +125,18 @@ cd web && npm test    # frontend
 
 Both apps deploy from GitHub Actions on push to `main`, with path filters so each deploys independently. Full one-time Azure setup, environment variables, and required secrets are in [docs/deployment.md](docs/deployment.md).
 
+### One-command demo (cost-controlled)
+
+To stand up a throwaway demo environment and tear it down to ~$0 when finished:
+
+```powershell
+cp scripts/demo.config.example.json scripts/demo.config.json   # fill in your values
+pwsh ./scripts/azure-up.ps1      # provision + deploy + seed, prints the demo URL
+pwsh ./scripts/azure-down.ps1    # delete everything
+```
+
+The demo uses Consumption/serverless/Free tiers (near-zero idle cost) and runs with the timer and LinkedIn posting disabled, so it never auto-posts. See [scripts/README.md](scripts/README.md).
+
 ## License
 
 [MIT](LICENSE) (c) Derek Huynen

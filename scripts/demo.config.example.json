@@ -1,0 +1,23 @@
+{
+	"subscriptionId": "<your-azure-subscription-id>",
+	"location": "eastus",
+	"swaLocation": "eastus2",
+	"resourceGroup": "linkedin-ai-demo-rg",
+	"namePrefix": "liaidemo",
+	"dryRunDailyCap": 50,
+	"seedGallery": true,
+	"openai": {
+		"endpointWest": "https://<your-west-resource>.openai.azure.com/",
+		"apiKeyWest": "<your-west-key>",
+		"apiVersionWest": "2025-01-01-preview",
+		"gptDeployment": "gpt-4.1",
+		"endpointEast": "https://<your-east-resource>.openai.azure.com/",
+		"apiKeyEast": "<your-east-key>",
+		"apiVersionEast": "2024-02-01",
+		"dalleDeployment": "dall-e-3"
+	},
+	"linkedin": {
+		"accessToken": "",
+		"memberUrn": ""
+	}
+}
