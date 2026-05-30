@@ -1,8 +1,4 @@
 import axios from 'axios';
-import { createReadStream } from 'fs';
-import { writeFile, unlink } from 'fs/promises';
-import { join } from 'path';
-import { tmpdir } from 'os';
 
 /**
  * Service for interacting with the LinkedIn API, including posting content and uploading images.

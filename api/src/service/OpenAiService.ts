@@ -200,28 +200,9 @@ export class OpenAiService {
 				deployment: dalleDeployment,
 			});
 
-			console.log('==== DALL-E 3 Configuration (East Region) ====');
-			console.log(`- Model Name: ${dalleDetails.modelName}`);
-			console.log(`- Deployment: ${dalleDeployment}`);
-			console.log(`- Endpoint: ${eastEndpoint}`);
-			console.log(`- API Version: ${eastApiVersion}`);
 			console.log(
-				`- Using East Region API Key: ${!!process.env
-					.AZURE_OPENAI_API_KEY_EAST}`
+				`Generating image with DALL-E 3 (${dalleDetails.modelName}): size=${size}, quality=${quality}, style=${style}, prompt=${prompt.length} chars`
 			);
-			console.log('===============================');
-			console.log(
-				`- Using dedicated DALL-E API Key: ${!!process.env.DALLE_API_KEY}`
-			);
-			console.log('===============================');
-
-			console.log(
-				`Generating image with DALL-E 3 (${dalleDetails.modelName}):`
-			);
-			console.log(`- Size: ${size}`);
-			console.log(`- Quality: ${quality}`);
-			console.log(`- Style: ${style}`);
-			console.log(`- Prompt length: ${prompt.length} characters`);
 
 			const response = await dalleClient.images.generate({
 				model: dalleDetails.modelName,

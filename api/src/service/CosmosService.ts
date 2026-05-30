@@ -1,4 +1,9 @@
-import { CosmosClient, Container, ItemDefinition } from '@azure/cosmos';
+import {
+	CosmosClient,
+	Container,
+	FeedOptions,
+	ItemDefinition,
+} from '@azure/cosmos';
 
 /**
  * Options for CosmosService
@@ -98,7 +103,7 @@ export class CosmosService<T extends ItemDefinition = ItemDefinition> {
 		options?: { limit?: number; continuationToken?: string }
 	): Promise<T[]> {
 		try {
-			const queryOptions: any = {};
+			const queryOptions: FeedOptions = {};
 
 			if (options?.limit) {
 				queryOptions.maxItemCount = options.limit;
@@ -134,7 +139,7 @@ export class CosmosService<T extends ItemDefinition = ItemDefinition> {
 		options?: { limit?: number; continuationToken?: string }
 	): Promise<{ items: T[]; continuationToken?: string }> {
 		try {
-			const queryOptions: any = {};
+			const queryOptions: FeedOptions = {};
 
 			if (options?.limit) {
 				queryOptions.maxItemCount = options.limit;

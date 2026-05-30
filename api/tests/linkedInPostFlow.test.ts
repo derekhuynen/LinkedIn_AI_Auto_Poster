@@ -93,7 +93,37 @@ describe('linkedInPostFlow', () => {
 		});
 
 		expect(mocks.postToLinkedIn).toHaveBeenCalledTimes(1);
+		// The generated post text and the LinkedIn image asset must flow through.
+		expect(mocks.postToLinkedIn).toHaveBeenCalledWith(
+			'generated text',
+			'urn:li:digitalmediaAsset:123'
+		);
 		expect(mocks.createItem).toHaveBeenCalledTimes(1);
+		expect(mocks.createItem).toHaveBeenCalledWith(
+			expect.objectContaining({
+				topic: 'AI in healthcare',
+				linkedInPost: 'generated text',
+				imageAsset: 'urn:li:digitalmediaAsset:123',
+				triggerBy: 'timer',
+			})
+		);
+	});
+
+	it('still posts a text-only update when image generation fails', async () => {
+		mocks.generateImage.mockReset();
+		mocks.generateImage.mockRejectedValue(new Error('dalle down'));
+
+		await linkedInPostFlow(context, {
+			triggerBy: 'timer',
+			post: true,
+			persist: true,
+			generateImage: true,
+		});
+
+		// Image failure is swallowed; the post still goes out, without an image asset.
+		expect(mocks.uploadImageToLinkedIn).not.toHaveBeenCalled();
+		expect(mocks.postToLinkedIn).toHaveBeenCalledTimes(1);
+		expect(mocks.postToLinkedIn).toHaveBeenCalledWith('generated text', undefined);
 	});
 
 	it('skips image generation when generateImage is false', async () => {

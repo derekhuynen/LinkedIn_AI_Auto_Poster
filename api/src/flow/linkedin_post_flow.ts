@@ -1,4 +1,4 @@
-import { InvocationContext, trigger } from '@azure/functions';
+import { InvocationContext } from '@azure/functions';
 import { OpenAiService } from '../service/OpenAiService';
 import {
 	getModelDetails,
