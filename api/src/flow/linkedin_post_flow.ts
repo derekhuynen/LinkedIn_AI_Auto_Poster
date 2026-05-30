@@ -222,17 +222,19 @@ export async function linkedInPostFlow(
 					);
 					context.log('Image uploaded to Blob Storage:', blobStorageUrl);
 
-					imageAsset = await withRetry(
-						() =>
-							linkedinService.uploadImageToLinkedIn(
-								imageBuffer,
-								'linkedin-post-image.jpg'
-							),
-						3,
-						context,
-						'linkedin.uploadImageToLinkedIn'
-					);
-					context.log('Image successfully uploaded to LinkedIn');
+					if (options.post) {
+						imageAsset = await withRetry(
+							() =>
+								linkedinService.uploadImageToLinkedIn(
+									imageBuffer,
+									'linkedin-post-image.jpg'
+								),
+							3,
+							context,
+							'linkedin.uploadImageToLinkedIn'
+						);
+						context.log('Image successfully uploaded to LinkedIn');
+					}
 				}
 			} else {
 				context.log('Image generation is disabled. Skipping image creation.');
