@@ -28,6 +28,12 @@ jobs:
           npm run test
           npm run build
 
+      - name: Install Playwright browsers
+        run: cd web && npx playwright install --with-deps chromium
+
+      - name: E2E (Playwright)
+        run: cd web && npm run e2e
+
       - name: Deploy to Azure Static Web Apps
         # Deploy only on manual dispatch so every push stays green on build + tests.
         # (Requires the AZURE_STATIC_WEB_APPS_API_TOKEN secret.)
