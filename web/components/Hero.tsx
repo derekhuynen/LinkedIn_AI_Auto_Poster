@@ -53,7 +53,7 @@ export default function Hero() {
 					<a
 						href={GITHUB_URL}
 						target="_blank"
-						rel="noreferrer"
+						rel="noopener noreferrer"
 						className="focus-accent inline-flex items-center gap-2 rounded-lg border border-border-strong px-5 py-3 font-medium text-fg transition hover:border-accent hover:text-accent"
 					>
 						View source

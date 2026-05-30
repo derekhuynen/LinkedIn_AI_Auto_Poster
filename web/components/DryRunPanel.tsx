@@ -64,6 +64,7 @@ export default function DryRunPanel() {
 						<button
 							onClick={run}
 							disabled={disabled}
+							aria-busy={busy}
 							className="focus-accent mt-7 inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-3 font-medium text-bg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
 						>
 							{busy ? (
@@ -87,7 +88,7 @@ export default function DryRunPanel() {
 					</div>
 
 					{/* Right: result surface */}
-					<div className="lg:flex-1">
+					<div className="lg:flex-1" aria-live="polite" aria-busy={busy}>
 						<ResultSurface state={state} />
 					</div>
 				</div>
@@ -159,7 +160,7 @@ function ResultSurface({ state }: { state: State }) {
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
 						src={result.imageUrl}
-						alt=""
+						alt="AI-generated cover image for the post"
 						className="h-full w-full object-cover"
 					/>
 				</div>

@@ -14,7 +14,7 @@ export default function Footer() {
 						<a
 							href={GITHUB_URL}
 							target="_blank"
-							rel="noreferrer"
+							rel="noopener noreferrer"
 							className="text-muted transition hover:text-accent"
 						>
 							GitHub
@@ -22,14 +22,14 @@ export default function Footer() {
 						<a
 							href={`${GITHUB_URL}#readme`}
 							target="_blank"
-							rel="noreferrer"
+							rel="noopener noreferrer"
 							className="text-muted transition hover:text-accent"
 						>
 							Docs
 						</a>
 					</div>
 				</div>
-				<p className="mt-8 text-xs text-muted/70">
+				<p className="mt-8 text-xs text-muted">
 					Built by Derek Huynen. Demo previews are rate-capped and never
 					published to LinkedIn.
 				</p>
