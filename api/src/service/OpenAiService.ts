@@ -221,6 +221,9 @@ export class OpenAiService {
 				quality: quality,
 				style: style,
 			});
+			if (!response.data) {
+				throw new Error('No data returned from DALL-E 3');
+			}
 			const imageUrl = response.data[0]?.url;
 			if (!imageUrl) {
 				throw new Error('No image URL returned from DALL-E 3');

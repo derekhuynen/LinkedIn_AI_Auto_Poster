@@ -53,8 +53,11 @@ export class CosmosService<T> {
 	 */
 	async createItem(item: T): Promise<T> {
 		try {
-			const { resource } = await this.container.items.create(item);
-			return resource;
+			const { resource } = await this.container.items.create(item as any);
+			if (!resource) {
+				throw new Error('Cosmos create returned no resource');
+			}
+			return resource as unknown as T;
 		} catch (error) {
 			console.error('Error creating item:', error);
 			throw error;
@@ -72,8 +75,11 @@ export class CosmosService<T> {
 		try {
 			const { resource } = await this.container
 				.item(id, partitionKey)
-				.read<T>();
-			return resource;
+				.read<any>();
+			if (!resource) {
+				throw new Error(`Cosmos item not found: ${id}`);
+			}
+			return resource as T;
 		} catch (error) {
 			console.error('Error reading item:', error);
 			throw error;
@@ -106,7 +112,7 @@ export class CosmosService<T> {
 				.query<T>(query, queryOptions)
 				.fetchAll();
 			return resources;
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error querying items:', {
 				error: error.message,
 				stack: error.stack,
@@ -145,7 +151,7 @@ export class CosmosService<T> {
 				items: response.resources,
 				continuationToken: response.continuationToken,
 			};
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error querying items with pagination:', {
 				error: error.message,
 				stack: error.stack,
@@ -165,8 +171,10 @@ export class CosmosService<T> {
 			throw new Error('Container ID must be provided to setContainer method.');
 		}
 
-		this.container = this.client
-			.database(process.env.COSMOS_DATABASE_ID)
-			.container(containerId);
+		const databaseId = process.env.COSMOS_DATABASE_ID;
+		if (!databaseId) {
+			throw new Error('COSMOS_DATABASE_ID is not set');
+		}
+		this.container = this.client.database(databaseId).container(containerId);
 	}
 }

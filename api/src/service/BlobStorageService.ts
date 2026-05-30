@@ -76,7 +76,7 @@ export class BlobStorageService {
 			});
 			console.log(`Image uploaded successfully to: ${blockBlobClient.url}`);
 			return blockBlobClient.url;
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error uploading image to blob storage:', error);
 			throw new Error(
 				`Failed to upload image to blob storage: ${error.message}`
