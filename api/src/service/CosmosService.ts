@@ -1,4 +1,4 @@
-import { CosmosClient, Container } from '@azure/cosmos';
+import { CosmosClient, Container, ItemDefinition } from '@azure/cosmos';
 
 /**
  * Options for CosmosService
@@ -11,7 +11,7 @@ interface CosmosServiceOptions {
  * Service for managing Cosmos DB operations
  * @template T - The type of items stored in the container
  */
-export class CosmosService<T> {
+export class CosmosService<T extends ItemDefinition = ItemDefinition> {
 	private client: CosmosClient;
 	private container: Container;
 
@@ -53,11 +53,11 @@ export class CosmosService<T> {
 	 */
 	async createItem(item: T): Promise<T> {
 		try {
-			const { resource } = await this.container.items.create(item as any);
+			const { resource } = await this.container.items.create<T>(item);
 			if (!resource) {
 				throw new Error('Cosmos create returned no resource');
 			}
-			return resource as unknown as T;
+			return resource;
 		} catch (error) {
 			console.error('Error creating item:', error);
 			throw error;
@@ -75,11 +75,11 @@ export class CosmosService<T> {
 		try {
 			const { resource } = await this.container
 				.item(id, partitionKey)
-				.read<any>();
+				.read<T>();
 			if (!resource) {
 				throw new Error(`Cosmos item not found: ${id}`);
 			}
-			return resource as T;
+			return resource;
 		} catch (error) {
 			console.error('Error reading item:', error);
 			throw error;
