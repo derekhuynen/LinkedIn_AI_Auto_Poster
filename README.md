@@ -16,11 +16,9 @@
 
 A timer-triggered Azure Function picks a fresh topic, drafts the post with gpt-5-mini, generates a cover image with gpt-image-1, publishes to LinkedIn, and archives every run to Cosmos DB. A Next.js dashboard lets anyone browse what it has shipped and watch it generate a sample post live.
 
-## Live demo
+## Demo
 
-**Try it:** [zealous-water-0f40a230f.7.azurestaticapps.net](https://zealous-water-0f40a230f.7.azurestaticapps.net)
-
-The demo is a read-only gallery of real auto-posted content plus a live, rate-capped "dry-run" that generates a sample post and image on demand but never publishes to LinkedIn. To run it locally with sample data (no Azure needed):
+A read-only gallery of auto-posted content plus a rate-capped "dry-run" that generates a sample post and image on demand but never publishes to LinkedIn. Run it locally with sample data (no Azure needed):
 
 ```bash
 cd web
