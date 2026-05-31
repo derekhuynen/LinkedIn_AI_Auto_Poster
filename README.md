@@ -1,12 +1,20 @@
+<div align="center">
+
 # LinkedIn AI Auto Poster
 
-An autonomous content pipeline on Azure that writes and publishes LinkedIn posts on a schedule. A timer-triggered Azure Function picks a fresh topic, drafts the post with gpt-5-mini, generates a cover image with gpt-image-1, publishes to LinkedIn, and archives every run to Cosmos DB. A Next.js dashboard lets anyone browse what it has shipped and watch it generate a sample post live.
+### An autonomous Azure pipeline that writes, illustrates, and ships LinkedIn posts on a schedule
 
-[![API CI](https://github.com/derekhuynen/LinkedIn_AI_Auto_Poster/actions/workflows/main_auto-poster-function.yml/badge.svg)](https://github.com/derekhuynen/LinkedIn_AI_Auto_Poster/actions/workflows/main_auto-poster-function.yml)
+[![API CI](https://github.com/derekhuynen/linkedin-ai-auto-poster/actions/workflows/main_auto-poster-function.yml/badge.svg)](https://github.com/derekhuynen/linkedin-ai-auto-poster/actions/workflows/main_auto-poster-function.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6)
 ![Azure Functions](https://img.shields.io/badge/Azure-Functions-0062ad)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000)
+
+![Dashboard hero](docs/images/dashboard-hero.png)
+
+</div>
+
+A timer-triggered Azure Function picks a fresh topic, drafts the post with gpt-5-mini, generates a cover image with gpt-image-1, publishes to LinkedIn, and archives every run to Cosmos DB. A Next.js dashboard lets anyone browse what it has shipped and watch it generate a sample post live.
 
 ## Live demo
 
@@ -20,13 +28,18 @@ npm install
 npm run dev   # sample-data mode is on by default
 ```
 
-![Dashboard hero](docs/images/dashboard-hero.png)
-
 ![Live dry-run generating a post](docs/images/dashboard-dryrun.png)
 
 Click any card in the gallery to read the full post:
 
 ![Reading a post in a modal](docs/images/dashboard-modal.png)
+
+<details>
+<summary>More views</summary>
+
+![Mobile dashboard](docs/images/dashboard-mobile.png)
+
+</details>
 
 ## Features
 
