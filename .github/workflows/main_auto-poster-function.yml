@@ -1,0 +1,43 @@
+name: Build and test API - linkedin-ai-auto-poster
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'api/**'
+      - '.github/workflows/main_auto-poster-function.yml'
+  pull_request:
+    paths:
+      - 'api/**'
+      - '.github/workflows/main_auto-poster-function.yml'
+  workflow_dispatch:
+
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './api' # path to the Azure Function App project
+  NODE_VERSION: '22.x' # Node version for the CI build/test runner
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v4
+
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 'Resolve Project Dependencies, Typecheck, Test, Build'
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          npm ci
+          npm run typecheck
+          npm test
+          npm run build
+          popd
